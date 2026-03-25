@@ -24,7 +24,7 @@ class WidgetActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.feed_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = FeedAdapter(repository.getItems().toMutableList()) { item ->
+        adapter = FeedAdapter(repository.getItemsWithTodos(this).toMutableList()) { item ->
             repository.removeItem(item.id)
             refreshList()
         }
@@ -76,7 +76,7 @@ class WidgetActivity : AppCompatActivity() {
     }
 
     private fun refreshList() {
-        adapter.updateItems(repository.getItems().toMutableList())
+        adapter.updateItems(repository.getItemsWithTodos(this).toMutableList())
         SuperDreamsWidget.refreshWidget(this)
     }
 

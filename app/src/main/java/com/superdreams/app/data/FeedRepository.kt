@@ -139,21 +139,11 @@ class FeedRepository(context: Context) {
     }
 
     private fun generateRandomItem(): FeedItem {
-        val isNews = Math.random() > 0.4
-        return if (isNews) {
-            FeedItem(
-                id = UUID.randomUUID().toString(),
-                title = NEWS_TITLES.random(),
-                subtitle = NEWS_SUBTITLES.random(),
-                type = FeedType.NEWS
-            )
-        } else {
-            FeedItem(
-                id = UUID.randomUUID().toString(),
-                title = TODO_TITLES.random(),
-                subtitle = TODO_SUBTITLES.random(),
-                type = FeedType.TODO
-            )
-        }
+        return FeedItem(
+            id = UUID.randomUUID().toString(),
+            title = NEWS_TITLES.random(),
+            subtitle = NEWS_SUBTITLES.random(),
+            type = FeedType.NEWS
+        )
     }
 }
