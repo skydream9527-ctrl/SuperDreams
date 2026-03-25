@@ -25,7 +25,11 @@ class WidgetActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         adapter = FeedAdapter(repository.getItemsWithTodos(this).toMutableList()) { item ->
-            repository.removeItem(item.id)
+            if (item.type == com.superdreams.app.data.FeedType.NOTIFICATION) {
+                com.superdreams.app.data.NotificationRepository.getInstance(this).removeNotification(item.id)
+            } else {
+                repository.removeItem(item.id)
+            }
             refreshList()
         }
         recyclerView.adapter = adapter
@@ -43,7 +47,11 @@ class WidgetActivity : AppCompatActivity() {
                 val position = viewHolder.adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val item = adapter.getItemAt(position)
-                    repository.removeItem(item.id)
+                    if (item.type == com.superdreams.app.data.FeedType.NOTIFICATION) {
+                        com.superdreams.app.data.NotificationRepository.getInstance(this@WidgetActivity).removeNotification(item.id)
+                    } else {
+                        repository.removeItem(item.id)
+                    }
                     refreshList()
                 }
             }
