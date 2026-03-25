@@ -17,11 +17,11 @@ class WidgetRemoteViewsFactory(
     private val repository = FeedRepository.getInstance(context)
 
     override fun onCreate() {
-        items = repository.getItems()
+        items = repository.getItemsWithTodos(context)
     }
 
     override fun onDataSetChanged() {
-        items = repository.getItems()
+        items = repository.getItemsWithTodos(context)
     }
 
     override fun onDestroy() {}

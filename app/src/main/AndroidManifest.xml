@@ -29,6 +29,11 @@
             android:theme="@style/Theme.SuperDreams" />
 
         <activity
+            android:name=".ui.TodoActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SuperDreams" />
+
+        <activity
             android:name=".ui.WidgetActivity"
             android:exported="false"
             android:theme="@style/Theme.SuperDreams.Transparent"

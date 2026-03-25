@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.superdreams.app.data.FeedRepository
 import com.superdreams.app.ui.FeedAdapter
 import com.superdreams.app.ui.KeywordActivity
+import com.superdreams.app.ui.TodoActivity
 import com.superdreams.app.widget.SuperDreamsWidget
 
 class MainActivity : AppCompatActivity() {
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.main_feed_list)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = FeedAdapter(repository.getItems().toMutableList()) { item ->
+        adapter = FeedAdapter(repository.getItemsWithTodos(this).toMutableList()) { item ->
             repository.removeItem(item.id)
             refreshList()
         }
@@ -81,6 +82,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btn_manage_keywords).setOnClickListener {
             startActivity(Intent(this, KeywordActivity::class.java))
         }
+
+        findViewById<Button>(R.id.btn_manage_todos).setOnClickListener {
+            startActivity(Intent(this, TodoActivity::class.java))
+        }
     }
 
     override fun onResume() {
@@ -89,7 +94,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshList() {
-        adapter.updateItems(repository.getItems().toMutableList())
+        adapter.updateItems(repository.getItemsWithTodos(this).toMutableList())
         SuperDreamsWidget.refreshWidget(this)
     }
 

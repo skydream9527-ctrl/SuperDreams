@@ -96,6 +96,15 @@ class FeedRepository(context: Context) {
         }
     }
 
+    /**
+     * Get feed items with user todos interleaved based on user's preferred mode.
+     */
+    fun getItemsWithTodos(context: android.content.Context): List<FeedItem> {
+        val contentItems = getItems().filter { it.type != FeedType.TODO }
+        val todoRepo = TodoRepository.getInstance(context)
+        return todoRepo.interleaveIntoFeed(contentItems)
+    }
+
     fun removeItem(itemId: String) {
         val items = getItems().toMutableList()
         items.removeAll { it.id == itemId }

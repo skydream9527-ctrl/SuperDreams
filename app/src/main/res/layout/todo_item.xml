@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/keyword_chip_bg"
+    android:paddingVertical="12dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="8dp"
+    android:layout_marginBottom="8dp">
+
+    <!-- Drag handle -->
+    <ImageView
+        android:id="@+id/todo_item_drag"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_drag_handle"
+        android:padding="4dp"
+        android:contentDescription="拖动" />
+
+    <!-- Index number -->
+    <TextView
+        android:id="@+id/todo_item_index"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:gravity="center"
+        android:textColor="#00D2FF"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <!-- Content -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+
+        <TextView
+            android:id="@+id/todo_item_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/todo_item_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#80FFFFFF"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <!-- Remove button -->
+    <ImageView
+        android:id="@+id/todo_item_remove"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_dismiss"
+        android:padding="4dp"
+        android:contentDescription="删除" />
+</LinearLayout>
