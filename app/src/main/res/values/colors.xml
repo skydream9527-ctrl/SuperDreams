@@ -11,4 +11,19 @@
     <color name="text_hint">#60FFFFFF</color>
     <color name="news_color">#6C63FF</color>
     <color name="todo_color">#00D2FF</color>
+
+    <!-- Pastel card backgrounds -->
+    <color name="pastel_red">#FFEDE9</color>
+    <color name="pastel_blue">#E8F0FE</color>
+    <color name="pastel_yellow">#FFF8E1</color>
+    <color name="pastel_purple">#F3E8FD</color>
+    <color name="pastel_green">#E6F9ED</color>
+    <color name="pastel_pink">#FDE8F0</color>
+    <color name="pastel_cyan">#E0F7FA</color>
+    <color name="pastel_orange">#FFF3E0</color>
+
+    <!-- Card text colors (dark for pastel backgrounds) -->
+    <color name="card_text_primary">#212121</color>
+    <color name="card_text_secondary">#616161</color>
+    <color name="card_icon_dismiss">#9E9E9E</color>
 </resources>

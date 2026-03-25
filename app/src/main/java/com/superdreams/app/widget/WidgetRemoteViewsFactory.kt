@@ -2,6 +2,7 @@ package com.superdreams.app.widget
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.superdreams.app.R
@@ -15,6 +16,19 @@ class WidgetRemoteViewsFactory(
 
     private var items = listOf<FeedItem>()
     private val repository = FeedRepository.getInstance(context)
+
+    companion object {
+        val PASTEL_COLORS = intArrayOf(
+            Color.parseColor("#FFEDE9"),  // pastel red
+            Color.parseColor("#E8F0FE"),  // pastel blue
+            Color.parseColor("#FFF8E1"),  // pastel yellow
+            Color.parseColor("#F3E8FD"),  // pastel purple
+            Color.parseColor("#E6F9ED"),  // pastel green
+            Color.parseColor("#FDE8F0"),  // pastel pink
+            Color.parseColor("#E0F7FA"),  // pastel cyan
+            Color.parseColor("#FFF3E0")   // pastel orange
+        )
+    }
 
     override fun onCreate() {
         items = repository.getItemsWithTodos(context)
@@ -37,6 +51,10 @@ class WidgetRemoteViewsFactory(
 
         views.setTextViewText(R.id.item_title, item.title)
         views.setTextViewText(R.id.item_subtitle, item.subtitle)
+
+        // Apply deterministic pastel background based on item ID
+        val colorIndex = Math.abs(item.id.hashCode()) % PASTEL_COLORS.size
+        views.setInt(R.id.item_card_root, "setBackgroundColor", PASTEL_COLORS[colorIndex])
 
         when (item.type) {
             FeedType.NEWS -> {

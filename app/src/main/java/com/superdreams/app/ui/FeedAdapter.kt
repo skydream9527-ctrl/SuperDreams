@@ -1,5 +1,7 @@
 package com.superdreams.app.ui
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +18,21 @@ class FeedAdapter(
     private val onDismiss: (FeedItem) -> Unit
 ) : RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
 
+    companion object {
+        val PASTEL_COLORS = intArrayOf(
+            Color.parseColor("#FFEDE9"),  // pastel red
+            Color.parseColor("#E8F0FE"),  // pastel blue
+            Color.parseColor("#FFF8E1"),  // pastel yellow
+            Color.parseColor("#F3E8FD"),  // pastel purple
+            Color.parseColor("#E6F9ED"),  // pastel green
+            Color.parseColor("#FDE8F0"),  // pastel pink
+            Color.parseColor("#E0F7FA"),  // pastel cyan
+            Color.parseColor("#FFF3E0")   // pastel orange
+        )
+    }
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val cardRoot: View = view.findViewById(R.id.feed_card_root)
         val typeIndicator: View = view.findViewById(R.id.feed_type_indicator)
         val typeIcon: ImageView = view.findViewById(R.id.feed_type_icon)
         val title: TextView = view.findViewById(R.id.feed_title)
@@ -33,6 +49,14 @@ class FeedAdapter(
         val item = items[position]
         holder.title.text = item.title
         holder.subtitle.text = item.subtitle
+
+        // Apply deterministic pastel background with rounded corners
+        val colorIndex = Math.abs(item.id.hashCode()) % PASTEL_COLORS.size
+        val bg = GradientDrawable().apply {
+            setColor(PASTEL_COLORS[colorIndex])
+            cornerRadius = 12f * holder.cardRoot.context.resources.displayMetrics.density
+        }
+        holder.cardRoot.background = bg
 
         when (item.type) {
             FeedType.NEWS -> {
