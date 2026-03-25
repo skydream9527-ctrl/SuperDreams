@@ -75,12 +75,14 @@ class ContentCrawler {
             val sourceEl = result.selectFirst("p.c-author span, span.c-color-gray, div[class*=source]")
             val sourceName = sourceEl?.text()?.trim() ?: "百度新闻"
 
-            val linkUrl = titleEl.attr("href")
+            val linkUrl = titleEl.attr("href").let {
+                if (it.startsWith("http")) it else "https://news.baidu.com$it"
+            }
 
             items.add(FeedItem(
                 id = UUID.randomUUID().toString(),
                 title = title,
-                subtitle = if (snippet.length > 80) snippet.take(80) + "..." else snippet,
+                subtitle = if (snippet.length > 300) snippet.take(300) + "..." else snippet,
                 type = FeedType.CRAWLED,
                 source = sourceName,
                 url = linkUrl,
@@ -120,7 +122,7 @@ class ContentCrawler {
             items.add(FeedItem(
                 id = UUID.randomUUID().toString(),
                 title = title,
-                subtitle = if (snippet.length > 80) snippet.take(80) + "..." else snippet,
+                subtitle = if (snippet.length > 300) snippet.take(300) + "..." else snippet,
                 type = FeedType.CRAWLED,
                 source = sourceName,
                 url = linkUrl,
@@ -160,7 +162,7 @@ class ContentCrawler {
             items.add(FeedItem(
                 id = UUID.randomUUID().toString(),
                 title = title,
-                subtitle = if (snippet.length > 80) snippet.take(80) + "..." else snippet,
+                subtitle = if (snippet.length > 300) snippet.take(300) + "..." else snippet,
                 type = FeedType.CRAWLED,
                 source = sourceName,
                 url = linkUrl,
@@ -182,11 +184,12 @@ class ContentCrawler {
                 .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
                 .build()
 
-            val response = client.newCall(request).execute()
-            if (response.isSuccessful) {
-                response.body?.string()
-            } else {
-                null
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    response.body?.string()
+                } else {
+                    null
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()

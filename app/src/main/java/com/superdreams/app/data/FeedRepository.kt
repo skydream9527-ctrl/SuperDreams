@@ -97,16 +97,28 @@ class FeedRepository(context: Context) {
     }
 
     /**
-     * Get feed items with user todos interleaved based on user's preferred mode.
+     * Get feed items with user todos and captured notifications interleaved.
+     * Notifications are the most time-sensitive so they appear at top, sorted by timestamp.
      */
     fun getItemsWithTodos(context: android.content.Context): List<FeedItem> {
         val contentItems = getItems().filter { it.type != FeedType.TODO }
         val todoRepo = TodoRepository.getInstance(context)
-        return todoRepo.interleaveIntoFeed(contentItems)
+        val withTodos = todoRepo.interleaveIntoFeed(contentItems)
+        // Prepend newest notifications
+        val notifRepo = com.superdreams.app.data.NotificationRepository.getInstance(context)
+        val notifications = notifRepo.getNotifications()
+        return notifications + withTodos
     }
 
     fun removeItem(itemId: String) {
-        val items = getItems().toMutableList()
+        // Read raw stored list (without auto-padding) so we remove exactly the target item
+        val json = prefs.getString(KEY_ITEMS, null)
+        val items: MutableList<FeedItem> = if (json != null) {
+            val type = object : TypeToken<List<FeedItem>>() {}.type
+            gson.fromJson<List<FeedItem>>(json, type).toMutableList()
+        } else {
+            mutableListOf()
+        }
         items.removeAll { it.id == itemId }
         while (items.size < MIN_ITEMS) {
             items.add(generateRandomItem())
@@ -125,13 +137,9 @@ class FeedRepository(context: Context) {
      * removes old crawled/news items, and adds new crawled content.
      */
     fun replaceCrawledItems(crawledItems: List<FeedItem>) {
-        val existing = getItems().toMutableList()
-        // Keep only TODO items from existing list
-        val todos = existing.filter { it.type == FeedType.TODO }
-        val newList = mutableListOf<FeedItem>()
-        newList.addAll(crawledItems)
-        newList.addAll(todos)
-        saveItems(newList)
+        // TODOs are stored separately in TodoRepository; nothing to preserve here.
+        // Just replace all content items with newly crawled ones.
+        saveItems(crawledItems)
     }
 
     private fun saveItems(items: List<FeedItem>) {

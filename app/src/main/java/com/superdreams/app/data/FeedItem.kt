@@ -12,5 +12,5 @@ data class FeedItem(
 )
 
 enum class FeedType {
-    NEWS, TODO, CRAWLED
+    NEWS, TODO, CRAWLED, NOTIFICATION
 }

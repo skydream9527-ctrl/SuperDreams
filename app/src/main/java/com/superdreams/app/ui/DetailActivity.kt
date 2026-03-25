@@ -74,12 +74,13 @@ class DetailActivity : AppCompatActivity() {
             infoView.visibility = View.GONE
         }
 
-        // Open in browser button
+        // Open in browser button — show for any non-empty URL
         val btnOpen = findViewById<Button>(R.id.btn_open_browser)
-        if (url.isNotEmpty() && url.startsWith("http")) {
+        if (url.isNotEmpty()) {
             btnOpen.visibility = View.VISIBLE
             btnOpen.setOnClickListener {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                val finalUrl = if (url.startsWith("http")) url else "https://news.baidu.com$url"
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(finalUrl)))
             }
         } else {
             btnOpen.visibility = View.GONE

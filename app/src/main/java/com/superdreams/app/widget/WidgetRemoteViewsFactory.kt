@@ -72,6 +72,13 @@ class WidgetRemoteViewsFactory(
                     views.setTextViewText(R.id.item_subtitle, "来源: ${item.source} · ${item.subtitle}")
                 }
             }
+            FeedType.NOTIFICATION -> {
+                views.setImageViewResource(R.id.item_type_icon, R.drawable.ic_notification)
+                views.setInt(R.id.item_type_indicator, "setBackgroundResource", R.drawable.type_indicator_notification)
+                if (item.source.isNotEmpty()) {
+                    views.setTextViewText(R.id.item_subtitle, "📱 ${item.source}")
+                }
+            }
         }
 
         val fillInIntent = Intent().apply {

@@ -4,9 +4,12 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,7 +35,11 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         adapter = FeedAdapter(repository.getItemsWithTodos(this).toMutableList()) { item ->
-            repository.removeItem(item.id)
+            if (item.type == com.superdreams.app.data.FeedType.NOTIFICATION) {
+                com.superdreams.app.data.NotificationRepository.getInstance(this).removeNotification(item.id)
+            } else {
+                repository.removeItem(item.id)
+            }
             refreshList()
         }
         recyclerView.adapter = adapter
@@ -50,7 +57,11 @@ class MainActivity : AppCompatActivity() {
                 val position = viewHolder.adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val item = adapter.getItemAt(position)
-                    repository.removeItem(item.id)
+                    if (item.type == com.superdreams.app.data.FeedType.NOTIFICATION) {
+                        com.superdreams.app.data.NotificationRepository.getInstance(this@MainActivity).removeNotification(item.id)
+                    } else {
+                        repository.removeItem(item.id)
+                    }
                     refreshList()
                 }
             }
@@ -91,6 +102,21 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         refreshList()
+        checkNotificationAccess()
+    }
+
+    private fun checkNotificationAccess() {
+        val enabledPackages = NotificationManagerCompat.getEnabledListenerPackages(this)
+        if (!enabledPackages.contains(packageName)) {
+            AlertDialog.Builder(this)
+                .setTitle("需要通知访问权限")
+                .setMessage("SuperDreams 需要「通知使用权」才能将手机推送消息展示在 Feed 中。\n\n请在接下来的设置页面中开启 SuperDreams 的通知访问权限。")
+                .setPositiveButton("去授权") { _, _ ->
+                    startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                }
+                .setNegativeButton("暂不授权", null)
+                .show()
+        }
     }
 
     private fun refreshList() {

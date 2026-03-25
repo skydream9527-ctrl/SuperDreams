@@ -15,8 +15,14 @@ class DismissActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ACTION_DISMISS) {
             val itemId = intent.getStringExtra(EXTRA_ITEM_ID) ?: return
-            val repository = FeedRepository.getInstance(context)
-            repository.removeItem(itemId)
+            // Check notifications first; fall back to feed repository
+            val notifRepo = com.superdreams.app.data.NotificationRepository.getInstance(context)
+            val isNotification = notifRepo.getNotifications().any { it.id == itemId }
+            if (isNotification) {
+                notifRepo.removeNotification(itemId)
+            } else {
+                FeedRepository.getInstance(context).removeItem(itemId)
+            }
             SuperDreamsWidget.refreshWidget(context)
         }
     }

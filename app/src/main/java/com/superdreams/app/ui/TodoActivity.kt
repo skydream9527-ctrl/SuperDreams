@@ -64,6 +64,8 @@ class TodoActivity : AppCompatActivity() {
             ): Boolean {
                 val from = viewHolder.adapterPosition
                 val to = target.adapterPosition
+                if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION) return false
+                // Update in-memory list first, then persist
                 adapter.moveItem(from, to)
                 todoRepo.moveTodo(from, to)
                 return true

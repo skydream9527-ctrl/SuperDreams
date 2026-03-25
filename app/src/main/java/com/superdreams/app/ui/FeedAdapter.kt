@@ -86,6 +86,13 @@ class FeedAdapter(
                     holder.subtitle.text = "来源: ${item.source}"
                 }
             }
+            FeedType.NOTIFICATION -> {
+                holder.typeIcon.setImageResource(R.drawable.ic_notification)
+                holder.typeIndicator.setBackgroundResource(R.drawable.type_indicator_notification)
+                if (item.source.isNotEmpty()) {
+                    holder.subtitle.text = "📱 ${item.source}"
+                }
+            }
         }
 
         // Expanded state
@@ -103,7 +110,10 @@ class FeedAdapter(
                     if (isNotEmpty()) append(" · ")
                     append("关键词: ${item.keyword}")
                 }
-                if (item.type == FeedType.TODO) append("待办事项")
+                if (item.type == FeedType.TODO) {
+                    if (isNotEmpty()) append(" · ")
+                    append("待办事项")
+                }
             }
             holder.expandedSource.text = sourceInfo
             holder.expandedHint.text = if (item.url.isNotEmpty()) "点击查看详情 →" else "点击查看 →"
@@ -113,13 +123,26 @@ class FeedAdapter(
 
         // Click handler: toggle expand → open detail
         holder.cardRoot.setOnClickListener {
-            val currentItem = items[holder.adapterPosition]
+            val position = holder.adapterPosition
+            if (position == RecyclerView.NO_POSITION) return@setOnClickListener
+            val currentItem = items[position]
             if (expandedIds.contains(currentItem.id)) {
                 // Already expanded → open detail
                 val context = holder.itemView.context
                 val intent = Intent(context, DetailActivity::class.java).apply {
                     putExtra(DetailActivity.EXTRA_TITLE, currentItem.title)
-                    putExtra(DetailActivity.EXTRA_CONTENT, currentItem.subtitle)
+                    // For crawled items, build a richer content string for the detail page
+                    val detailContent = if (currentItem.type == com.superdreams.app.data.FeedType.CRAWLED && currentItem.source.isNotEmpty()) {
+                        buildString {
+                            append(currentItem.subtitle)
+                            if (currentItem.url.isNotEmpty()) {
+                                append("\n\n📖 此处为摘要内容，点击下方按钮可在浏览器中阅读完整原文。")
+                            }
+                        }
+                    } else {
+                        currentItem.subtitle
+                    }
+                    putExtra(DetailActivity.EXTRA_CONTENT, detailContent)
                     putExtra(DetailActivity.EXTRA_SOURCE, currentItem.source)
                     putExtra(DetailActivity.EXTRA_URL, currentItem.url)
                     putExtra(DetailActivity.EXTRA_KEYWORD, currentItem.keyword)
@@ -139,7 +162,7 @@ class FeedAdapter(
                     val idx = items.indexOfFirst { it.id == id }
                     if (idx >= 0) notifyItemChanged(idx)
                 }
-                notifyItemChanged(holder.adapterPosition)
+                notifyItemChanged(position)
             }
         }
     }
