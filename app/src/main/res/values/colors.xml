@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#6C63FF</color>
+    <color name="primary_dark">#4834DF</color>
+    <color name="accent">#00D2FF</color>
+    <color name="background_dark">#0D0D1A</color>
+    <color name="surface_dark">#1A1A2E</color>
+    <color name="card_dark">#2D2D44</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#99FFFFFF</color>
+    <color name="text_hint">#60FFFFFF</color>
+    <color name="news_color">#6C63FF</color>
+    <color name="todo_color">#00D2FF</color>
+</resources>

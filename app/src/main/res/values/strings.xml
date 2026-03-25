@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Super Dreams</string>
+    <string name="widget_name">Super Dreams Feed</string>
+    <string name="widget_description">全屏信息流小部件，显示新闻和待办事项</string>
+</resources>
