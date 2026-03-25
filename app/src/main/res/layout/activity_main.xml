@@ -31,17 +31,35 @@
             android:textSize="14sp"
             android:layout_marginTop="4dp" />
 
-        <Button
-            android:id="@+id/btn_add_widget"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginTop="16dp"
-            android:text="添加桌面小部件"
-            android:textColor="#FFFFFF"
-            android:textSize="13sp"
-            android:background="@drawable/btn_add_widget_bg"
-            android:paddingHorizontal="20dp"
-            android:textAllCaps="false" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/btn_add_widget"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="添加桌面小部件"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:background="@drawable/btn_add_widget_bg"
+                android:paddingHorizontal="20dp"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_manage_keywords"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:text="🔑 管理关键词"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:background="@drawable/btn_crawl_bg"
+                android:paddingHorizontal="20dp"
+                android:textAllCaps="false" />
+        </LinearLayout>
     </LinearLayout>
 
     <TextView

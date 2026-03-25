@@ -111,6 +111,20 @@ class FeedRepository(context: Context) {
         saveItems(items)
     }
 
+    /**
+     * Replace feed with crawled items. Keeps existing TODO items,
+     * removes old crawled/news items, and adds new crawled content.
+     */
+    fun replaceCrawledItems(crawledItems: List<FeedItem>) {
+        val existing = getItems().toMutableList()
+        // Keep only TODO items from existing list
+        val todos = existing.filter { it.type == FeedType.TODO }
+        val newList = mutableListOf<FeedItem>()
+        newList.addAll(crawledItems)
+        newList.addAll(todos)
+        saveItems(newList)
+    }
+
     private fun saveItems(items: List<FeedItem>) {
         prefs.edit().putString(KEY_ITEMS, gson.toJson(items)).apply()
     }

@@ -5,9 +5,12 @@ data class FeedItem(
     val title: String,
     val subtitle: String,
     val type: FeedType,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val source: String = "",
+    val url: String = "",
+    val keyword: String = ""
 )
 
 enum class FeedType {
-    NEWS, TODO
+    NEWS, TODO, CRAWLED
 }

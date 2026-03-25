@@ -47,6 +47,13 @@ class WidgetRemoteViewsFactory(
                 views.setImageViewResource(R.id.item_type_icon, R.drawable.ic_todo)
                 views.setInt(R.id.item_type_indicator, "setBackgroundResource", R.drawable.type_indicator_todo)
             }
+            FeedType.CRAWLED -> {
+                views.setImageViewResource(R.id.item_type_icon, R.drawable.ic_news)
+                views.setInt(R.id.item_type_indicator, "setBackgroundResource", R.drawable.type_indicator_news)
+                if (item.source.isNotEmpty()) {
+                    views.setTextViewText(R.id.item_subtitle, "来源: ${item.source} · ${item.subtitle}")
+                }
+            }
         }
 
         val fillInIntent = Intent().apply {

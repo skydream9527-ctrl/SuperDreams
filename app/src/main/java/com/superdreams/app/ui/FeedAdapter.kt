@@ -43,6 +43,13 @@ class FeedAdapter(
                 holder.typeIcon.setImageResource(R.drawable.ic_todo)
                 holder.typeIndicator.setBackgroundResource(R.drawable.type_indicator_todo)
             }
+            FeedType.CRAWLED -> {
+                holder.typeIcon.setImageResource(R.drawable.ic_news)
+                holder.typeIndicator.setBackgroundResource(R.drawable.type_indicator_news)
+                if (item.source.isNotEmpty()) {
+                    holder.subtitle.text = "来源: ${item.source} · ${item.subtitle}"
+                }
+            }
         }
     }
 

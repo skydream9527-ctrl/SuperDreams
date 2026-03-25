@@ -2,6 +2,7 @@ package com.superdreams.app
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.superdreams.app.data.FeedRepository
 import com.superdreams.app.ui.FeedAdapter
+import com.superdreams.app.ui.KeywordActivity
 import com.superdreams.app.widget.SuperDreamsWidget
 
 class MainActivity : AppCompatActivity() {
@@ -74,6 +76,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btn_add_widget).setOnClickListener {
             requestWidgetPin()
+        }
+
+        findViewById<Button>(R.id.btn_manage_keywords).setOnClickListener {
+            startActivity(Intent(this, KeywordActivity::class.java))
         }
     }
 
