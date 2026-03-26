@@ -4,196 +4,111 @@ import com.superdreams.app.data.FeedItem
 import com.superdreams.app.data.FeedType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.jsoup.Jsoup
+import org.json.JSONObject
 import java.net.URLEncoder
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
+/**
+ * Fetches news from NewsAPI.org using the /v2/everything endpoint.
+ * Each keyword is queried separately, results are deduplicated and shuffled.
+ */
 class ContentCrawler {
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
-        .followRedirects(true)
         .build()
 
     companion object {
-        private const val USER_AGENT =
-            "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-        private const val MAX_RESULTS_PER_SOURCE = 5
+        private const val API_KEY = "a490849e920447779010b24e3da4ab60"
+        private const val BASE_URL = "https://newsapi.org/v2/everything"
+        private const val PAGE_SIZE = 10
     }
 
     /**
-     * Crawl all sources for the given keywords and return aggregated feed items.
+     * Fetch news for all keywords and return aggregated feed items.
      */
     fun crawlAll(keywords: List<String>): List<FeedItem> {
         val allItems = mutableListOf<FeedItem>()
         for (keyword in keywords) {
             try {
-                allItems.addAll(crawlBaiduNews(keyword))
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            try {
-                allItems.addAll(crawlBingNews(keyword))
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            try {
-                allItems.addAll(crawlSogouNews(keyword))
+                allItems.addAll(fetchNews(keyword))
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-        // Deduplicate by title similarity and shuffle for variety
+        // Deduplicate by title prefix and shuffle for variety
         return allItems
-            .distinctBy { it.title.take(20) }
+            .distinctBy { it.title.take(30) }
             .shuffled()
     }
 
     /**
-     * Crawl Baidu News search results.
+     * Query NewsAPI /v2/everything for a single keyword.
      */
-    private fun crawlBaiduNews(keyword: String): List<FeedItem> {
+    private fun fetchNews(keyword: String): List<FeedItem> {
         val encoded = URLEncoder.encode(keyword, "UTF-8")
-        val url = "https://news.baidu.com/ns?word=$encoded&tn=news&from=news&cl=2&rn=10"
-        val html = fetchPage(url) ?: return emptyList()
+        val url = "$BASE_URL?q=$encoded&pageSize=$PAGE_SIZE&sortBy=publishedAt&language=zh&apiKey=$API_KEY"
 
-        val doc = Jsoup.parse(html)
+        val request = Request.Builder()
+            .url(url)
+            .header("Accept", "application/json")
+            .build()
+
         val items = mutableListOf<FeedItem>()
 
-        // Baidu News result items
-        val results = doc.select("div.result, div[class*=result]")
-        for (result in results.take(MAX_RESULTS_PER_SOURCE)) {
-            val titleEl = result.selectFirst("h3 a, a[class*=title]") ?: continue
-            val title = titleEl.text().trim()
-            if (title.isEmpty()) continue
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) return emptyList()
 
-            val snippetEl = result.selectFirst("div.c-summary, div.c-abstract, span.c-font-normal, div[class*=summary]")
-            val snippet = snippetEl?.text()?.trim() ?: ""
+            val body = response.body?.string() ?: return emptyList()
+            val json = JSONObject(body)
 
-            val sourceEl = result.selectFirst("p.c-author span, span.c-color-gray, div[class*=source]")
-            val sourceName = sourceEl?.text()?.trim() ?: "百度新闻"
+            if (json.optString("status") != "ok") return emptyList()
 
-            val linkUrl = titleEl.attr("href").let {
-                if (it.startsWith("http")) it else "https://news.baidu.com$it"
-            }
+            val articles = json.optJSONArray("articles") ?: return emptyList()
 
-            items.add(FeedItem(
-                id = UUID.randomUUID().toString(),
-                title = title,
-                subtitle = if (snippet.length > 300) snippet.take(300) + "..." else snippet,
-                type = FeedType.CRAWLED,
-                source = sourceName,
-                url = linkUrl,
-                keyword = keyword
-            ))
-        }
-        return items
-    }
+            for (i in 0 until articles.length()) {
+                val article = articles.getJSONObject(i)
 
-    /**
-     * Crawl Bing News (Chinese) search results.
-     */
-    private fun crawlBingNews(keyword: String): List<FeedItem> {
-        val encoded = URLEncoder.encode(keyword, "UTF-8")
-        val url = "https://cn.bing.com/news/search?q=$encoded&FORM=HDRSC6"
-        val html = fetchPage(url) ?: return emptyList()
+                val title = article.optString("title", "").trim()
+                if (title.isEmpty() || title == "[Removed]") continue
 
-        val doc = Jsoup.parse(html)
-        val items = mutableListOf<FeedItem>()
-
-        val cards = doc.select("div.news-card, div.newsitem, a.news-card")
-        for (card in cards.take(MAX_RESULTS_PER_SOURCE)) {
-            val titleEl = card.selectFirst("a.title, div.title a, span.title") ?: continue
-            val title = titleEl.text().trim()
-            if (title.isEmpty()) continue
-
-            val snippetEl = card.selectFirst("div.snippet, div.descripion, p")
-            val snippet = snippetEl?.text()?.trim() ?: ""
-
-            val sourceEl = card.selectFirst("div.source span, span.source")
-            val sourceName = sourceEl?.text()?.trim() ?: "必应新闻"
-
-            val linkUrl = titleEl.attr("href").let {
-                if (it.startsWith("http")) it else "https://cn.bing.com$it"
-            }
-
-            items.add(FeedItem(
-                id = UUID.randomUUID().toString(),
-                title = title,
-                subtitle = if (snippet.length > 300) snippet.take(300) + "..." else snippet,
-                type = FeedType.CRAWLED,
-                source = sourceName,
-                url = linkUrl,
-                keyword = keyword
-            ))
-        }
-        return items
-    }
-
-    /**
-     * Crawl Sogou News search results.
-     */
-    private fun crawlSogouNews(keyword: String): List<FeedItem> {
-        val encoded = URLEncoder.encode(keyword, "UTF-8")
-        val url = "https://news.sogou.com/news?query=$encoded&mode=1"
-        val html = fetchPage(url) ?: return emptyList()
-
-        val doc = Jsoup.parse(html)
-        val items = mutableListOf<FeedItem>()
-
-        val results = doc.select("div.news-list li, div.results div.vrwrap, div.rb")
-        for (result in results.take(MAX_RESULTS_PER_SOURCE)) {
-            val titleEl = result.selectFirst("h3 a, a.title, p.news-title a") ?: continue
-            val title = titleEl.text().trim()
-            if (title.isEmpty()) continue
-
-            val snippetEl = result.selectFirst("p.news-txt, div.news-detail, p.txt-info")
-            val snippet = snippetEl?.text()?.trim() ?: ""
-
-            val sourceEl = result.selectFirst("p.news-from span, span.news-from")
-            val sourceName = sourceEl?.text()?.trim() ?: "搜狗新闻"
-
-            val linkUrl = titleEl.attr("href").let {
-                if (it.startsWith("http")) it else "https://news.sogou.com$it"
-            }
-
-            items.add(FeedItem(
-                id = UUID.randomUUID().toString(),
-                title = title,
-                subtitle = if (snippet.length > 300) snippet.take(300) + "..." else snippet,
-                type = FeedType.CRAWLED,
-                source = sourceName,
-                url = linkUrl,
-                keyword = keyword
-            ))
-        }
-        return items
-    }
-
-    /**
-     * Fetch a web page and return HTML content.
-     */
-    private fun fetchPage(url: String): String? {
-        return try {
-            val request = Request.Builder()
-                .url(url)
-                .header("User-Agent", USER_AGENT)
-                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-                .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    response.body?.string()
-                } else {
-                    null
+                val description = article.optString("description", "").trim()
+                val content = article.optString("content", "").trim()
+                // Use description first, fall back to content snippet
+                val subtitle = when {
+                    description.isNotEmpty() -> description
+                    content.isNotEmpty() -> content.take(300)
+                    else -> ""
                 }
+
+                val sourceName = article.optJSONObject("source")?.optString("name", "") ?: ""
+                val articleUrl = article.optString("url", "")
+                val publishedAt = article.optString("publishedAt", "")
+
+                // Parse ISO 8601 timestamp to millis
+                val timestamp = try {
+                    java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US).let {
+                        it.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                        it.parse(publishedAt)?.time ?: System.currentTimeMillis()
+                    }
+                } catch (e: Exception) {
+                    System.currentTimeMillis()
+                }
+
+                items.add(FeedItem(
+                    id = UUID.randomUUID().toString(),
+                    title = title,
+                    subtitle = if (subtitle.length > 300) subtitle.take(300) + "..." else subtitle,
+                    type = FeedType.CRAWLED,
+                    timestamp = timestamp,
+                    source = sourceName,
+                    url = articleUrl,
+                    keyword = keyword
+                ))
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
         }
+        return items
     }
 }
