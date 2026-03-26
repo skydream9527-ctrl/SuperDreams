@@ -128,27 +128,25 @@ class MainActivity : AppCompatActivity() {
         val widgetProvider = ComponentName(this, SuperDreamsWidget::class.java)
 
         if (appWidgetManager.isRequestPinAppWidgetSupported) {
-            // Launcher supports the pin API — use it directly
             appWidgetManager.requestPinAppWidget(widgetProvider, null, null)
         } else {
-            // Most Chinese ROM launchers (MIUI, EMUI, ColorOS, etc.) don't support the pin API.
-            // Show step-by-step instructions instead.
             showWidgetGuideDialog()
         }
     }
 
     private fun showWidgetGuideDialog() {
+        val msg = StringBuilder()
+        msg.append("请按以下步骤手动添加 SuperDreams 小部件：\n\n")
+        msg.append("1. 返回桌面，在空白处长按（约 1-2 秒）\n\n")
+        msg.append("2. 点击弹出菜单中的「小部件」或「Widget」\n\n")
+        msg.append("3. 在小部件列表中找到 SuperDreams\n\n")
+        msg.append("4. 长按 SuperDreams 小部件，拖动到桌面上即可\n\n")
+        msg.append("小米/华为设备：长按桌面 -> 小部件 -> 搜索 SuperDreams\n")
+        msg.append("三星设备：长按桌面空白 -> Widget -> 找到本应用")
+
         AlertDialog.Builder(this)
-            .setTitle("📲 如何添加桌面小部件")
-            .setMessage(
-                "请按以下步骤手动添加 SuperDreams 小部件：\n\n" +
-                "1️⃣  返回桌面，在空白处 **长按**（约 1-2 秒）\n\n" +
-                "2️⃣  点击弹出菜单中的「小部件」或「Widget」\n\n" +
-                "3️⃣  在小部件列表中找到 **SuperDreams**\n\n" +
-                "4️⃣  长按 SuperDreams 小部件，拖动到桌面上即可\n\n" +
-                "💡 小米/华为设备：长按桌面 → 小部件 → 搜索"Super Dreams"\n" +
-                "💡 三星设备：长按桌面空白 → Widget → 找到本应用"
-            )
+            .setTitle("如何添加桌面小部件")
+            .setMessage(msg.toString())
             .setPositiveButton("知道了", null)
             .show()
     }
