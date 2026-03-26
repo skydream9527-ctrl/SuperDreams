@@ -116,7 +116,11 @@ class FeedAdapter(
                 }
             }
             holder.expandedSource.text = sourceInfo
-            holder.expandedHint.text = if (item.url.isNotEmpty()) "点击查看详情 →" else "点击查看 →"
+            holder.expandedHint.text = when {
+                item.type == FeedType.NOTIFICATION -> "打开来源应用 →"
+                item.url.isNotEmpty() -> "点击查看详情 →"
+                else -> "点击查看 →"
+            }
         } else {
             holder.title.maxLines = 1
         }

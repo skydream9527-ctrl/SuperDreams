@@ -7,6 +7,7 @@ import java.util.UUID
 
 class FeedRepository(context: Context) {
 
+    private val appContext = context.applicationContext
     private val prefs = context.getSharedPreferences("feed_data", Context.MODE_PRIVATE)
     private val gson = Gson()
 
@@ -130,6 +131,7 @@ class FeedRepository(context: Context) {
         val items = getItems().toMutableList()
         items.add(0, item)
         saveItems(items)
+        HistoryRepository.getInstance(appContext).archiveItem(item)
     }
 
     /**
@@ -140,6 +142,9 @@ class FeedRepository(context: Context) {
         // TODOs are stored separately in TodoRepository; nothing to preserve here.
         // Just replace all content items with newly crawled ones.
         saveItems(crawledItems)
+        // Archive all crawled items for history
+        val historyRepo = HistoryRepository.getInstance(appContext)
+        crawledItems.forEach { historyRepo.archiveItem(it) }
     }
 
     private fun saveItems(items: List<FeedItem>) {

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.superdreams.app.data.FeedRepository
 import com.superdreams.app.ui.FeedAdapter
 import com.superdreams.app.ui.KeywordActivity
+import com.superdreams.app.ui.HistoryActivity
 import com.superdreams.app.ui.TodoActivity
 import com.superdreams.app.widget.SuperDreamsWidget
 
@@ -95,6 +96,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btn_manage_todos).setOnClickListener {
             startActivity(Intent(this, TodoActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.btn_history).setOnClickListener {
+            startActivity(Intent(this, HistoryActivity::class.java))
         }
     }
 

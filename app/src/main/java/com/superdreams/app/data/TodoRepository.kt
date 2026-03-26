@@ -11,6 +11,7 @@ import java.util.UUID
  */
 class TodoRepository(context: Context) {
 
+    private val appContext = context.applicationContext
     private val prefs = context.getSharedPreferences("todo_data", Context.MODE_PRIVATE)
     private val gson = Gson()
 
@@ -50,6 +51,8 @@ class TodoRepository(context: Context) {
         val todos = getTodos().toMutableList()
         todos.add(todo)
         saveTodos(todos)
+        // Archive for history
+        HistoryRepository.getInstance(appContext).archiveItem(todo)
         return todo
     }
 

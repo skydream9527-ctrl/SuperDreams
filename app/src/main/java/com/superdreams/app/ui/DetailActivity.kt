@@ -43,15 +43,26 @@ class DetailActivity : AppCompatActivity() {
         }
         cardArea.background = bg
 
-        // Set type icon
+        // Set type icon and label
         val typeIcon = findViewById<ImageView>(R.id.detail_type_icon)
         val typeLabel = findViewById<TextView>(R.id.detail_type_label)
-        if (type == "TODO") {
-            typeIcon.setImageResource(R.drawable.ic_todo)
-            typeLabel.text = "待办事项"
-        } else {
-            typeIcon.setImageResource(R.drawable.ic_news)
-            typeLabel.text = if (type == "CRAWLED") "抓取资讯" else "新闻资讯"
+        when (type) {
+            "TODO" -> {
+                typeIcon.setImageResource(R.drawable.ic_todo)
+                typeLabel.text = "待办事项"
+            }
+            "NOTIFICATION" -> {
+                typeIcon.setImageResource(R.drawable.ic_notification)
+                typeLabel.text = "推送通知"
+            }
+            "CRAWLED" -> {
+                typeIcon.setImageResource(R.drawable.ic_news)
+                typeLabel.text = "抓取资讯"
+            }
+            else -> {
+                typeIcon.setImageResource(R.drawable.ic_news)
+                typeLabel.text = "新闻资讯"
+            }
         }
 
         // Set content
@@ -61,7 +72,7 @@ class DetailActivity : AppCompatActivity() {
         // Source & keyword info
         val infoText = buildString {
             if (source.isNotEmpty()) append("来源: $source")
-            if (keyword.isNotEmpty()) {
+            if (keyword.isNotEmpty() && type != "NOTIFICATION") {
                 if (isNotEmpty()) append("\n")
                 append("关键词: $keyword")
             }
@@ -74,9 +85,24 @@ class DetailActivity : AppCompatActivity() {
             infoView.visibility = View.GONE
         }
 
-        // Open in browser button — show for any non-empty URL
+        // Action button
         val btnOpen = findViewById<Button>(R.id.btn_open_browser)
-        if (url.isNotEmpty()) {
+        if (type == "NOTIFICATION" && keyword.isNotEmpty()) {
+            // For notifications, keyword stores the source package name
+            // Try to launch the source app
+            val launchIntent = packageManager.getLaunchIntentForPackage(keyword)
+            if (launchIntent != null) {
+                btnOpen.text = "打开来源应用"
+                btnOpen.visibility = View.VISIBLE
+                btnOpen.setOnClickListener {
+                    startActivity(launchIntent)
+                }
+            } else {
+                btnOpen.visibility = View.GONE
+            }
+        } else if (url.isNotEmpty()) {
+            // For news/crawled items, open in browser
+            btnOpen.text = "在浏览器中打开原文"
             btnOpen.visibility = View.VISIBLE
             btnOpen.setOnClickListener {
                 val finalUrl = if (url.startsWith("http")) url else "https://news.baidu.com$url"

@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken
  */
 class NotificationRepository(context: Context) {
 
+    private val appContext = context.applicationContext
     private val prefs = context.getSharedPreferences("notification_data", Context.MODE_PRIVATE)
     private val gson = Gson()
 
@@ -46,6 +47,8 @@ class NotificationRepository(context: Context) {
         // Keep at most MAX_NOTIFICATIONS
         val trimmed = if (list.size > MAX_NOTIFICATIONS) list.take(MAX_NOTIFICATIONS) else list
         saveNotifications(trimmed)
+        // Archive for history
+        HistoryRepository.getInstance(appContext).archiveItem(item)
     }
 
     fun removeNotification(id: String) {

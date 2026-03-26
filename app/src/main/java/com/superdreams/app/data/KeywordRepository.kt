@@ -12,7 +12,7 @@ class KeywordRepository(context: Context) {
     companion object {
         private const val KEY_KEYWORDS = "keywords"
         const val MIN_KEYWORDS = 5
-        const val MAX_KEYWORDS = 10
+        const val MAX_KEYWORDS = 60
 
         @Volatile
         private var instance: KeywordRepository? = null
