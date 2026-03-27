@@ -7,7 +7,15 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -18,23 +26,41 @@ import androidx.recyclerview.widget.RecyclerView
 import com.superdreams.app.data.FeedRepository
 import com.superdreams.app.data.ThemePreference
 import com.superdreams.app.ui.FeedAdapter
-import com.superdreams.app.ui.AppSearchBottomSheet
+import com.superdreams.app.ui.AppListActivity
 import com.superdreams.app.ui.KeywordActivity
 import com.superdreams.app.ui.HistoryActivity
 import com.superdreams.app.ui.MyActivity
 import com.superdreams.app.ui.TodoActivity
 import com.superdreams.app.widget.SuperDreamsWidget
+import java.net.URLEncoder
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: FeedAdapter
     private lateinit var repository: FeedRepository
+    private lateinit var pageList: View
+    private lateinit var pageBrowser: View
+    private lateinit var tabList: Button
+    private lateinit var tabBrowser: Button
+    private lateinit var tabApps: Button
+    private lateinit var browserSpinner: Spinner
+    private lateinit var browserInput: EditText
+    private lateinit var browserGoButton: Button
+    private lateinit var browserProgress: ProgressBar
+    private lateinit var browserWebView: WebView
+    private var browserLoaded = false
+    private var currentPage = HomePage.LIST
+    private val searchEngines = linkedMapOf(
+        "百度" to "https://www.baidu.com/s?wd=",
+        "搜狗" to "https://www.sogou.com/web?query=",
+        "必应" to "https://www.bing.com/search?q=",
+        "抖音" to "https://www.douyin.com/search/"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        applyHomeTheme()
 
         repository = FeedRepository.getInstance(this)
 
@@ -95,6 +121,21 @@ class MainActivity : AppCompatActivity() {
         })
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
+        pageList = findViewById(R.id.page_list)
+        pageBrowser = findViewById(R.id.page_browser)
+        tabList = findViewById(R.id.tab_list)
+        tabBrowser = findViewById(R.id.tab_browser)
+        tabApps = findViewById(R.id.tab_apps)
+        browserSpinner = findViewById(R.id.browser_engine_spinner)
+        browserInput = findViewById(R.id.browser_query_input)
+        browserGoButton = findViewById(R.id.browser_go_btn)
+        browserProgress = findViewById(R.id.browser_progress)
+        browserWebView = findViewById(R.id.browser_webview)
+
+        setupBrowser()
+        setupBottomTabs()
+        applyHomeTheme()
+
         findViewById<Button>(R.id.btn_add_widget).setOnClickListener {
             requestWidgetPin()
         }
@@ -114,10 +155,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btn_my).setOnClickListener {
             startActivity(Intent(this, MyActivity::class.java))
         }
-
-        findViewById<android.view.View>(R.id.home_app_search_entry).setOnClickListener {
-            AppSearchBottomSheet().show(supportFragmentManager, "app_search_bottom_sheet")
-        }
     }
 
     override fun onResume() {
@@ -125,6 +162,19 @@ class MainActivity : AppCompatActivity() {
         applyHomeTheme()
         refreshList()
         checkNotificationAccess()
+    }
+
+    override fun onBackPressed() {
+        if (currentPage == HomePage.BROWSER && browserWebView.canGoBack()) {
+            browserWebView.goBack()
+            return
+        }
+        super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        browserWebView.destroy()
+        super.onDestroy()
     }
 
     private fun checkNotificationAccess() {
@@ -216,14 +266,25 @@ class MainActivity : AppCompatActivity() {
         ).forEach { id ->
             findViewById<Button>(id).setTextColor(palette.titleTextColor)
         }
-        findViewById<TextView>(R.id.home_app_search_entry).apply {
-            background = createRoundedBackground(
-                palette.searchFillColor,
-                palette.searchStrokeColor,
-                14f
-            )
-            setTextColor(palette.subtitleTextColor)
-        }
+        browserInput.background = createRoundedBackground(
+            palette.searchFillColor,
+            palette.searchStrokeColor,
+            14f
+        )
+        browserInput.setTextColor(palette.titleTextColor)
+        browserInput.setHintTextColor(palette.subtitleTextColor)
+        browserSpinner.background = createRoundedBackground(
+            palette.secondaryFillColor,
+            palette.secondaryStrokeColor,
+            14f
+        )
+        browserGoButton.background = createRoundedBackground(
+            palette.primaryFillColor,
+            palette.primaryStrokeColor,
+            14f
+        )
+        browserGoButton.setTextColor(palette.titleTextColor)
+        updateBottomTabStyles()
     }
 
     private fun createRoundedBackground(fillColor: Int, strokeColor: Int, radiusDp: Float): GradientDrawable {
@@ -234,4 +295,109 @@ class MainActivity : AppCompatActivity() {
             setStroke((1f * resources.displayMetrics.density).toInt().coerceAtLeast(1), strokeColor)
         }
     }
+
+    private fun setupBottomTabs() {
+        tabList.setOnClickListener {
+            switchPage(HomePage.LIST)
+        }
+        tabBrowser.setOnClickListener {
+            switchPage(HomePage.BROWSER)
+        }
+        tabApps.setOnClickListener {
+            startActivity(Intent(this, AppListActivity::class.java))
+        }
+        switchPage(HomePage.LIST)
+    }
+
+    private fun switchPage(page: HomePage) {
+        currentPage = page
+        pageList.visibility = if (page == HomePage.LIST) View.VISIBLE else View.GONE
+        pageBrowser.visibility = if (page == HomePage.BROWSER) View.VISIBLE else View.GONE
+        if (page == HomePage.BROWSER && !browserLoaded) {
+            browserWebView.loadUrl("https://www.bing.com")
+            browserLoaded = true
+        }
+        updateBottomTabStyles()
+    }
+
+    private fun updateBottomTabStyles() {
+        val palette = ThemePreference.getPalette(this)
+        val selectedBackground = createRoundedBackground(
+            palette.primaryFillColor,
+            palette.primaryStrokeColor,
+            14f
+        )
+        val normalBackground = createRoundedBackground(
+            palette.secondaryFillColor,
+            palette.secondaryStrokeColor,
+            14f
+        )
+        val mapping = listOf(
+            tabList to HomePage.LIST,
+            tabBrowser to HomePage.BROWSER
+        )
+        mapping.forEach { (button, page) ->
+            button.background = if (page == currentPage) {
+                selectedBackground.constantState?.newDrawable()?.mutate()
+            } else {
+                normalBackground.constantState?.newDrawable()?.mutate()
+            }
+            button.setTextColor(palette.titleTextColor)
+        }
+        tabApps.background = normalBackground.constantState?.newDrawable()?.mutate()
+        tabApps.setTextColor(palette.titleTextColor)
+    }
+
+    private fun setupBrowser() {
+        val engineNames = searchEngines.keys.toList()
+        browserSpinner.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            engineNames
+        )
+
+        browserWebView.settings.javaScriptEnabled = true
+        browserWebView.settings.domStorageEnabled = true
+        browserWebView.settings.loadsImagesAutomatically = true
+        browserWebView.settings.useWideViewPort = true
+        browserWebView.settings.loadWithOverviewMode = true
+        browserWebView.webViewClient = WebViewClient()
+        browserWebView.webChromeClient = object : WebChromeClient() {
+            override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                browserProgress.progress = newProgress
+                browserProgress.visibility = if (newProgress in 1..99) View.VISIBLE else View.GONE
+            }
+        }
+
+        browserGoButton.setOnClickListener {
+            openBrowserInput()
+        }
+        browserInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                openBrowserInput()
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun openBrowserInput() {
+        val input = browserInput.text.toString().trim()
+        if (input.isEmpty()) return
+        val isUrl = input.startsWith("http://") || input.startsWith("https://")
+        val targetUrl = if (isUrl) {
+            input
+        } else {
+            val engine = browserSpinner.selectedItem?.toString().orEmpty()
+            val prefix = searchEngines[engine] ?: searchEngines.values.first()
+            prefix + URLEncoder.encode(input, "UTF-8")
+        }
+        browserWebView.loadUrl(targetUrl)
+        browserLoaded = true
+    }
+}
+
+enum class HomePage {
+    LIST, BROWSER
 }
