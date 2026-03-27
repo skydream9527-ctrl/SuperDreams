@@ -2,6 +2,7 @@ package com.superdreams.app.ui
 
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -14,7 +15,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.superdreams.app.R
@@ -44,7 +45,7 @@ class AppSearchBottomSheet : BottomSheetDialogFragment() {
             openApp(app)
         }
 
-        list.layoutManager = LinearLayoutManager(requireContext())
+        list.layoutManager = GridLayoutManager(requireContext(), 5)
         list.adapter = adapter
 
         apps.clear()
@@ -76,14 +77,38 @@ class AppSearchBottomSheet : BottomSheetDialogFragment() {
         val launchIntent = Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
-        val infos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            pm.queryIntentActivities(launchIntent, android.content.pm.PackageManager.ResolveInfoFlags.of(0))
+        val launcherInfos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pm.queryIntentActivities(
+                launchIntent,
+                PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_ALL.toLong())
+            )
         } else {
             @Suppress("DEPRECATION")
-            pm.queryIntentActivities(launchIntent, 0)
+            pm.queryIntentActivities(launchIntent, PackageManager.MATCH_ALL)
         }
-        return infos
-            .map { info -> info.toLaunchableApp(pm) }
+        val launcherApps = launcherInfos.map { info -> info.toLaunchableApp(pm) }
+
+        val installedApps = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pm.getInstalledApplications(
+                PackageManager.ApplicationInfoFlags.of(PackageManager.MATCH_ALL.toLong())
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            pm.getInstalledApplications(PackageManager.MATCH_ALL)
+        }
+            .mapNotNull { applicationInfo ->
+                val packageName = applicationInfo.packageName
+                val packageLaunchIntent = pm.getLaunchIntentForPackage(packageName) ?: return@mapNotNull null
+                val activityName = packageLaunchIntent.component?.className
+                LaunchableApp(
+                    label = applicationInfo.loadLabel(pm).toString(),
+                    packageName = packageName,
+                    activityName = activityName,
+                    icon = applicationInfo.loadIcon(pm)
+                )
+            }
+
+        return (launcherApps + installedApps)
             .distinctBy { it.packageName }
             .sortedBy { it.label.lowercase() }
     }
@@ -100,15 +125,19 @@ class AppSearchBottomSheet : BottomSheetDialogFragment() {
 
     private fun openApp(app: LaunchableApp) {
         val context = requireContext()
-        val explicitIntent = Intent(Intent.ACTION_MAIN).apply {
-            addCategory(Intent.CATEGORY_LAUNCHER)
-            component = ComponentName(app.packageName, app.activityName)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        if (!app.activityName.isNullOrEmpty()) {
+            val explicitIntent = Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_LAUNCHER)
+                component = ComponentName(app.packageName, app.activityName)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            runCatching {
+                startActivity(explicitIntent)
+                dismiss()
+                return
+            }
         }
         runCatching {
-            startActivity(explicitIntent)
-            dismiss()
-        }.onFailure {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(app.packageName)
             if (launchIntent != null) {
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -124,7 +153,7 @@ class AppSearchBottomSheet : BottomSheetDialogFragment() {
 data class LaunchableApp(
     val label: String,
     val packageName: String,
-    val activityName: String,
+    val activityName: String?,
     val icon: Drawable
 )
 
@@ -136,7 +165,6 @@ class AppListAdapter(
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val icon: ImageView = view.findViewById(R.id.item_app_icon)
         val name: TextView = view.findViewById(R.id.item_app_name)
-        val packageName: TextView = view.findViewById(R.id.item_app_package)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -149,7 +177,6 @@ class AppListAdapter(
         val item = items[position]
         holder.icon.setImageDrawable(item.icon)
         holder.name.text = item.label
-        holder.packageName.text = item.packageName
         holder.itemView.setOnClickListener { onClick(item) }
     }
 

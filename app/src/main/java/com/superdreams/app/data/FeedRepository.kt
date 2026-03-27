@@ -134,6 +134,17 @@ class FeedRepository(context: Context) {
         HistoryRepository.getInstance(appContext).archiveItem(item)
     }
 
+    fun hasCrawledNews(): Boolean {
+        val json = prefs.getString(KEY_ITEMS, null) ?: return false
+        return try {
+            val type = object : TypeToken<List<FeedItem>>() {}.type
+            val items = gson.fromJson<List<FeedItem>>(json, type)
+            items.any { it.type == FeedType.CRAWLED }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     /**
      * Replace feed with crawled items. Keeps existing TODO items,
      * removes old crawled/news items, and adds new crawled content.

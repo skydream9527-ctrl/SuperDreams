@@ -4,6 +4,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
     <application
         android:name=".SuperDreamsApp"
         android:allowBackup="true"
@@ -40,6 +47,11 @@
 
         <activity
             android:name=".ui.HistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SuperDreams" />
+
+        <activity
+            android:name=".ui.MyActivity"
             android:exported="false"
             android:theme="@style/Theme.SuperDreams" />
 
@@ -82,4 +94,3 @@
 
     </application>
 </manifest>
-

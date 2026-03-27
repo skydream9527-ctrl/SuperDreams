@@ -2,15 +2,26 @@ package com.superdreams.app
 
 import android.app.Application
 import androidx.work.*
+import com.superdreams.app.crawler.ContentCrawler
 import com.superdreams.app.crawler.CrawlWorker
+import com.superdreams.app.data.FeedRepository
+import com.superdreams.app.widget.SuperDreamsWidget
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 class SuperDreamsApp : Application() {
 
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     override fun onCreate() {
         super.onCreate()
         scheduleDailyCrawl()
+        ensureStartupNews()
     }
 
     fun scheduleDailyCrawl() {
@@ -55,5 +66,24 @@ class SuperDreamsApp : Application() {
             .build()
 
         WorkManager.getInstance(this).enqueue(oneTimeWork)
+    }
+
+    private fun ensureStartupNews() {
+        appScope.launch {
+            val feedRepo = FeedRepository.getInstance(applicationContext)
+            if (feedRepo.hasCrawledNews()) return@launch
+
+            val defaultKeywords = listOf("AI", "模型", "openclaw")
+            val crawledItems = ContentCrawler().crawlAll(defaultKeywords, maxItems = 20)
+            if (crawledItems.isNotEmpty()) {
+                feedRepo.replaceCrawledItems(crawledItems)
+                SuperDreamsWidget.refreshWidget(applicationContext)
+            }
+        }
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        appScope.cancel()
     }
 }

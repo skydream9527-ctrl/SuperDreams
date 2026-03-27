@@ -29,7 +29,8 @@ class ContentCrawler {
     /**
      * Fetch news for all keywords and return aggregated feed items.
      */
-    fun crawlAll(keywords: List<String>): List<FeedItem> {
+    fun crawlAll(keywords: List<String>, maxItems: Int = Int.MAX_VALUE): List<FeedItem> {
+        if (keywords.isEmpty()) return emptyList()
         val allItems = mutableListOf<FeedItem>()
         for (keyword in keywords) {
             try {
@@ -39,9 +40,11 @@ class ContentCrawler {
             }
         }
         // Deduplicate by title prefix and shuffle for variety
+        val limit = if (maxItems <= 0) 1 else maxItems
         return allItems
             .distinctBy { it.title.take(30) }
             .shuffled()
+            .take(limit)
     }
 
     /**

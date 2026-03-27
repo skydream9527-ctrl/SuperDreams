@@ -3,9 +3,12 @@ package com.superdreams.app
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
@@ -13,10 +16,12 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.superdreams.app.data.FeedRepository
+import com.superdreams.app.data.ThemePreference
 import com.superdreams.app.ui.FeedAdapter
 import com.superdreams.app.ui.AppSearchBottomSheet
 import com.superdreams.app.ui.KeywordActivity
 import com.superdreams.app.ui.HistoryActivity
+import com.superdreams.app.ui.MyActivity
 import com.superdreams.app.ui.TodoActivity
 import com.superdreams.app.widget.SuperDreamsWidget
 
@@ -29,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        applyHomeTheme()
 
         repository = FeedRepository.getInstance(this)
 
@@ -105,6 +111,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
 
+        findViewById<Button>(R.id.btn_my).setOnClickListener {
+            startActivity(Intent(this, MyActivity::class.java))
+        }
+
         findViewById<android.view.View>(R.id.home_app_search_entry).setOnClickListener {
             AppSearchBottomSheet().show(supportFragmentManager, "app_search_bottom_sheet")
         }
@@ -112,6 +122,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        applyHomeTheme()
         refreshList()
         checkNotificationAccess()
     }
@@ -161,5 +172,66 @@ class MainActivity : AppCompatActivity() {
             .setMessage(msg.toString())
             .setPositiveButton("知道了", null)
             .show()
+    }
+
+    private fun applyHomeTheme() {
+        val palette = ThemePreference.getPalette(this)
+        findViewById<View>(R.id.main_root).setBackgroundColor(palette.rootColor)
+        findViewById<View>(R.id.home_header_container).background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            orientation = GradientDrawable.Orientation.TOP_BOTTOM
+            colors = intArrayOf(palette.headerStartColor, palette.headerEndColor)
+            cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, 24f, 24f, 24f, 24f)
+        }
+        findViewById<TextView>(R.id.home_title).setTextColor(palette.titleTextColor)
+        findViewById<TextView>(R.id.home_subtitle).setTextColor(palette.subtitleTextColor)
+        findViewById<TextView>(R.id.home_swipe_hint).setTextColor(palette.hintTextColor)
+
+        val primaryBackground = createRoundedBackground(
+            palette.primaryFillColor,
+            palette.primaryStrokeColor,
+            16f
+        )
+        val secondaryBackground = createRoundedBackground(
+            palette.secondaryFillColor,
+            palette.secondaryStrokeColor,
+            16f
+        )
+        findViewById<Button>(R.id.btn_add_widget).background =
+            primaryBackground.constantState?.newDrawable()?.mutate()
+        listOf(
+            R.id.btn_manage_keywords,
+            R.id.btn_manage_todos,
+            R.id.btn_history,
+            R.id.btn_my
+        ).forEach { id ->
+            findViewById<Button>(id).background = secondaryBackground.constantState?.newDrawable()?.mutate()
+        }
+        listOf(
+            R.id.btn_add_widget,
+            R.id.btn_manage_keywords,
+            R.id.btn_manage_todos,
+            R.id.btn_history,
+            R.id.btn_my
+        ).forEach { id ->
+            findViewById<Button>(id).setTextColor(palette.titleTextColor)
+        }
+        findViewById<TextView>(R.id.home_app_search_entry).apply {
+            background = createRoundedBackground(
+                palette.searchFillColor,
+                palette.searchStrokeColor,
+                14f
+            )
+            setTextColor(palette.subtitleTextColor)
+        }
+    }
+
+    private fun createRoundedBackground(fillColor: Int, strokeColor: Int, radiusDp: Float): GradientDrawable {
+        return GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = radiusDp * resources.displayMetrics.density
+            setColor(fillColor)
+            setStroke((1f * resources.displayMetrics.density).toInt().coerceAtLeast(1), strokeColor)
+        }
     }
 }
