@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.superdreams.app.data.FeedRepository
 import com.superdreams.app.ui.FeedAdapter
+import com.superdreams.app.ui.AppSearchBottomSheet
 import com.superdreams.app.ui.KeywordActivity
 import com.superdreams.app.ui.HistoryActivity
 import com.superdreams.app.ui.TodoActivity
@@ -40,7 +41,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 repository.removeItem(item.id)
             }
-            refreshList()
+            adapter.removeItemById(item.id)
+            SuperDreamsWidget.refreshWidget(this)
         }
         recyclerView.adapter = adapter
 
@@ -62,7 +64,8 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         repository.removeItem(item.id)
                     }
-                    refreshList()
+                    adapter.removeItemById(item.id)
+                    SuperDreamsWidget.refreshWidget(this@MainActivity)
                 }
             }
 
@@ -100,6 +103,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btn_history).setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
+        }
+
+        findViewById<android.view.View>(R.id.home_app_search_entry).setOnClickListener {
+            AppSearchBottomSheet().show(supportFragmentManager, "app_search_bottom_sheet")
         }
     }
 

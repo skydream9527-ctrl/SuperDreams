@@ -30,7 +30,8 @@ class WidgetActivity : AppCompatActivity() {
             } else {
                 repository.removeItem(item.id)
             }
-            refreshList()
+            adapter.removeItemById(item.id)
+            SuperDreamsWidget.refreshWidget(this)
         }
         recyclerView.adapter = adapter
 
@@ -52,7 +53,8 @@ class WidgetActivity : AppCompatActivity() {
                     } else {
                         repository.removeItem(item.id)
                     }
-                    refreshList()
+                    adapter.removeItemById(item.id)
+                    SuperDreamsWidget.refreshWidget(this@WidgetActivity)
                 }
             }
 

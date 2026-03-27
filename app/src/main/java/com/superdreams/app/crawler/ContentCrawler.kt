@@ -76,10 +76,18 @@ class ContentCrawler {
 
                 val description = article.optString("description", "").trim()
                 val content = article.optString("content", "").trim()
-                // Use description first, fall back to content snippet
+                val mergedContent = buildString {
+                    if (description.isNotEmpty()) {
+                        append(description)
+                    }
+                    if (content.isNotEmpty() && !content.equals(description, ignoreCase = true)) {
+                        if (isNotEmpty()) append("\n\n")
+                        append(content)
+                    }
+                }.trim()
                 val subtitle = when {
                     description.isNotEmpty() -> description
-                    content.isNotEmpty() -> content.take(300)
+                    content.isNotEmpty() -> content
                     else -> ""
                 }
 
@@ -101,6 +109,7 @@ class ContentCrawler {
                     id = UUID.randomUUID().toString(),
                     title = title,
                     subtitle = if (subtitle.length > 300) subtitle.take(300) + "..." else subtitle,
+                    content = mergedContent,
                     type = FeedType.CRAWLED,
                     timestamp = timestamp,
                     source = sourceName,

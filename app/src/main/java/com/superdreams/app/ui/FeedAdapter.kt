@@ -58,6 +58,7 @@ class FeedAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
+        val supportsExpand = item.type == FeedType.NEWS || item.type == FeedType.CRAWLED
         holder.title.text = item.title
         holder.subtitle.text = item.subtitle
 
@@ -96,7 +97,7 @@ class FeedAdapter(
         }
 
         // Expanded state
-        val isExpanded = expandedIds.contains(item.id)
+        val isExpanded = supportsExpand && expandedIds.contains(item.id)
         holder.expandedSection.visibility = if (isExpanded) View.VISIBLE else View.GONE
 
         if (isExpanded) {
@@ -130,32 +131,13 @@ class FeedAdapter(
             val position = holder.adapterPosition
             if (position == RecyclerView.NO_POSITION) return@setOnClickListener
             val currentItem = items[position]
+            val canExpand = currentItem.type == FeedType.NEWS || currentItem.type == FeedType.CRAWLED
+            if (!canExpand) {
+                openDetail(holder, currentItem)
+                return@setOnClickListener
+            }
             if (expandedIds.contains(currentItem.id)) {
-                // Already expanded → open detail
-                val context = holder.itemView.context
-                val intent = Intent(context, DetailActivity::class.java).apply {
-                    putExtra(DetailActivity.EXTRA_TITLE, currentItem.title)
-                    // For crawled items, build a richer content string for the detail page
-                    val detailContent = if (currentItem.type == com.superdreams.app.data.FeedType.CRAWLED && currentItem.source.isNotEmpty()) {
-                        buildString {
-                            append(currentItem.subtitle)
-                            if (currentItem.url.isNotEmpty()) {
-                                append("\n\n📖 此处为摘要内容，点击下方按钮可在浏览器中阅读完整原文。")
-                            }
-                        }
-                    } else {
-                        currentItem.subtitle
-                    }
-                    putExtra(DetailActivity.EXTRA_CONTENT, detailContent)
-                    putExtra(DetailActivity.EXTRA_SOURCE, currentItem.source)
-                    putExtra(DetailActivity.EXTRA_URL, currentItem.url)
-                    putExtra(DetailActivity.EXTRA_KEYWORD, currentItem.keyword)
-                    putExtra(DetailActivity.EXTRA_TYPE, currentItem.type.name)
-                    putExtra(DetailActivity.EXTRA_COLOR, PASTEL_COLORS[
-                        Math.abs(currentItem.id.hashCode()) % PASTEL_COLORS.size
-                    ])
-                }
-                context.startActivity(intent)
+                openDetail(holder, currentItem)
             } else {
                 // Collapse any other expanded item
                 val previouslyExpanded = expandedIds.toSet()
@@ -171,9 +153,39 @@ class FeedAdapter(
         }
     }
 
+    private fun openDetail(holder: ViewHolder, item: FeedItem) {
+        val context = holder.itemView.context
+        val detailContent = when {
+            item.content.isNotBlank() -> item.content
+            item.subtitle.isNotBlank() -> item.subtitle
+            else -> item.title
+        }
+        val intent = Intent(context, DetailActivity::class.java).apply {
+            putExtra(DetailActivity.EXTRA_TITLE, item.title)
+            putExtra(DetailActivity.EXTRA_CONTENT, detailContent)
+            putExtra(DetailActivity.EXTRA_SOURCE, item.source)
+            putExtra(DetailActivity.EXTRA_URL, item.url)
+            putExtra(DetailActivity.EXTRA_KEYWORD, item.keyword)
+            putExtra(DetailActivity.EXTRA_TYPE, item.type.name)
+            putExtra(DetailActivity.EXTRA_COLOR, PASTEL_COLORS[
+                Math.abs(item.id.hashCode()) % PASTEL_COLORS.size
+            ])
+        }
+        context.startActivity(intent)
+    }
+
     override fun getItemCount(): Int = items.size
 
     fun getItemAt(position: Int): FeedItem = items[position]
+
+    fun removeItemById(itemId: String): FeedItem? {
+        val index = items.indexOfFirst { it.id == itemId }
+        if (index < 0) return null
+        val removed = items.removeAt(index)
+        expandedIds.remove(itemId)
+        notifyItemRemoved(index)
+        return removed
+    }
 
     fun updateItems(newItems: MutableList<FeedItem>) {
         val diffCallback = FeedDiffCallback(items, newItems)
