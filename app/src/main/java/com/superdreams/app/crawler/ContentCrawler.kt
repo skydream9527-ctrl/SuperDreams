@@ -4,8 +4,13 @@ import com.superdreams.app.data.FeedItem
 import com.superdreams.app.data.FeedType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.jsoup.Jsoup
+import org.jsoup.parser.Parser
 import org.json.JSONObject
 import java.net.URLEncoder
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -34,9 +39,17 @@ class ContentCrawler {
         val allItems = mutableListOf<FeedItem>()
         for (keyword in keywords) {
             try {
-                allItems.addAll(fetchNews(keyword))
+                val newsApiItems = fetchNewsFromNewsApi(keyword)
+                if (newsApiItems.isNotEmpty()) {
+                    allItems.addAll(newsApiItems)
+                } else {
+                    allItems.addAll(fetchNewsFromRss(keyword))
+                }
             } catch (e: Exception) {
-                e.printStackTrace()
+                try {
+                    allItems.addAll(fetchNewsFromRss(keyword))
+                } catch (_: Exception) {
+                }
             }
         }
         // Deduplicate by title prefix and shuffle for variety
@@ -50,13 +63,14 @@ class ContentCrawler {
     /**
      * Query NewsAPI /v2/everything for a single keyword.
      */
-    private fun fetchNews(keyword: String): List<FeedItem> {
+    private fun fetchNewsFromNewsApi(keyword: String): List<FeedItem> {
         val encoded = URLEncoder.encode(keyword, "UTF-8")
-        val url = "$BASE_URL?q=$encoded&pageSize=$PAGE_SIZE&sortBy=publishedAt&language=zh&apiKey=$API_KEY"
+        val url = "$BASE_URL?q=$encoded&pageSize=$PAGE_SIZE&sortBy=publishedAt&apiKey=$API_KEY"
 
         val request = Request.Builder()
             .url(url)
             .header("Accept", "application/json")
+            .header("User-Agent", "SuperDreams/1.0")
             .build()
 
         val items = mutableListOf<FeedItem>()
@@ -98,15 +112,10 @@ class ContentCrawler {
                 val articleUrl = article.optString("url", "")
                 val publishedAt = article.optString("publishedAt", "")
 
-                // Parse ISO 8601 timestamp to millis
-                val timestamp = try {
-                    java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US).let {
-                        it.timeZone = java.util.TimeZone.getTimeZone("UTC")
-                        it.parse(publishedAt)?.time ?: System.currentTimeMillis()
-                    }
-                } catch (e: Exception) {
-                    System.currentTimeMillis()
-                }
+                val timestamp = parseTimestamp(
+                    value = publishedAt,
+                    patterns = listOf("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                )
 
                 items.add(FeedItem(
                     id = UUID.randomUUID().toString(),
@@ -122,5 +131,63 @@ class ContentCrawler {
             }
         }
         return items
+    }
+
+    private fun fetchNewsFromRss(keyword: String): List<FeedItem> {
+        val encoded = URLEncoder.encode(keyword, "UTF-8")
+        val rssUrl = "https://news.google.com/rss/search?q=$encoded&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+        val request = Request.Builder()
+            .url(rssUrl)
+            .header("Accept", "application/rss+xml, application/xml;q=0.9, */*;q=0.8")
+            .header("User-Agent", "SuperDreams/1.0")
+            .build()
+
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) return emptyList()
+            val xml = response.body?.string() ?: return emptyList()
+            val document = Jsoup.parse(xml, "", Parser.xmlParser())
+            return document.select("item").mapNotNull { item ->
+                val title = item.selectFirst("title")?.text()?.trim().orEmpty()
+                if (title.isEmpty()) return@mapNotNull null
+                val descriptionHtml = item.selectFirst("description")?.text().orEmpty()
+                val description = Jsoup.parse(descriptionHtml).text().trim()
+                val url = item.selectFirst("link")?.text()?.trim().orEmpty()
+                val pubDate = item.selectFirst("pubDate")?.text()?.trim().orEmpty()
+                val sourceName = item.selectFirst("source")?.text()?.trim().orEmpty()
+
+                val subtitle = if (description.isNotEmpty()) description else title
+                FeedItem(
+                    id = UUID.randomUUID().toString(),
+                    title = title,
+                    subtitle = if (subtitle.length > 300) subtitle.take(300) + "..." else subtitle,
+                    content = description,
+                    type = FeedType.CRAWLED,
+                    timestamp = parseTimestamp(
+                        value = pubDate,
+                        patterns = listOf(
+                            "EEE, dd MMM yyyy HH:mm:ss Z",
+                            "EEE, dd MMM yyyy HH:mm:ss zzz"
+                        )
+                    ),
+                    source = sourceName,
+                    url = url,
+                    keyword = keyword
+                )
+            }
+        }
+    }
+
+    private fun parseTimestamp(value: String, patterns: List<String>): Long {
+        for (pattern in patterns) {
+            try {
+                val format = SimpleDateFormat(pattern, Locale.US).apply {
+                    timeZone = TimeZone.getTimeZone("UTC")
+                }
+                val parsed = format.parse(value)
+                if (parsed != null) return parsed.time
+            } catch (_: Exception) {
+            }
+        }
+        return System.currentTimeMillis()
     }
 }
