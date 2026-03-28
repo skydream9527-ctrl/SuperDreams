@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
 
-        findViewById<Button>(R.id.btn_my).setOnClickListener {
+        findViewById<View>(R.id.btn_my).setOnClickListener {
             startActivity(Intent(this, MyActivity::class.java))
         }
     }
@@ -247,23 +247,16 @@ class MainActivity : AppCompatActivity() {
             palette.secondaryStrokeColor,
             16f
         )
+        // btn_add_widget is primary, keyword/todo/history are secondary buttons in header
+        // btn_my is now a LinearLayout avatar button — skip Button casting for it
         findViewById<Button>(R.id.btn_add_widget).background =
             primaryBackground.constantState?.newDrawable()?.mutate()
         listOf(
             R.id.btn_manage_keywords,
             R.id.btn_manage_todos,
-            R.id.btn_history,
-            R.id.btn_my
+            R.id.btn_history
         ).forEach { id ->
             findViewById<Button>(id).background = secondaryBackground.constantState?.newDrawable()?.mutate()
-        }
-        listOf(
-            R.id.btn_add_widget,
-            R.id.btn_manage_keywords,
-            R.id.btn_manage_todos,
-            R.id.btn_history,
-            R.id.btn_my
-        ).forEach { id ->
             findViewById<Button>(id).setTextColor(palette.titleTextColor)
         }
         browserInput.background = createRoundedBackground(

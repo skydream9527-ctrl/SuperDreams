@@ -3,123 +3,136 @@
     android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F6F7FB"
+    android:background="#F2F3F8"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
+    <!-- ========== HEADER ========== -->
     <LinearLayout
         android:id="@+id/home_header_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/home_header_bg"
         android:orientation="vertical"
-        android:paddingBottom="16dp"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="36dp">
+        android:paddingTop="40dp"
+        android:paddingBottom="20dp"
+        android:paddingHorizontal="20dp">
 
-        <TextView
-            android:id="@+id/home_title"
-            android:layout_width="wrap_content"
+        <!-- Title Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="✨ Super Dreams"
-            android:textColor="#2B2B3A"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/home_subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="您的信息流和待办事项"
-            android:textColor="#6F7285"
-            android:textSize="14sp" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/home_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="✨ Super Dreams"
+                    android:textColor="#FFFFFF"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.01" />
+
+                <TextView
+                    android:id="@+id/home_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="您的信息流和待办事项"
+                    android:textColor="#CCE0FFFF"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- My / Profile Button -->
+            <LinearLayout
+                android:id="@+id/btn_my"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/home_btn_secondary_bg"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🙋"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Action Buttons — Single Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+            <Button
+                android:id="@+id/btn_add_widget"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@drawable/home_btn_primary_bg"
+                android:text="🧩 小部件"
+                android:textAllCaps="false"
+                android:textColor="#6C63FF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-                <Button
-                    android:id="@+id/btn_add_widget"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/home_btn_primary_bg"
-                    android:text="添加小部件"
-                    android:textAllCaps="false"
-                    android:textColor="#2F3347"
-                    android:textSize="13sp" />
+            <Button
+                android:id="@+id/btn_manage_keywords"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/home_btn_secondary_bg"
+                android:text="🔑 关键词"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
 
-                <Button
-                    android:id="@+id/btn_manage_keywords"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/home_btn_secondary_bg"
-                    android:text="🔑 关键词"
-                    android:textAllCaps="false"
-                    android:textColor="#2F3347"
-                    android:textSize="13sp" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/btn_manage_todos"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/home_btn_secondary_bg"
+                android:text="📋 待办"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btn_manage_todos"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/home_btn_secondary_bg"
-                    android:text="📋 待办"
-                    android:textAllCaps="false"
-                    android:textColor="#2F3347"
-                    android:textSize="13sp" />
-
-                <Button
-                    android:id="@+id/btn_history"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/home_btn_secondary_bg"
-                    android:text="📚 历史"
-                    android:textAllCaps="false"
-                    android:textColor="#2F3347"
-                    android:textSize="13sp" />
-
-                <Button
-                    android:id="@+id/btn_my"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/home_btn_secondary_bg"
-                    android:text="🙋 我的"
-                    android:textAllCaps="false"
-                    android:textColor="#2F3347"
-                    android:textSize="13sp" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/btn_history"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/home_btn_secondary_bg"
+                android:text="📚 历史"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 
+    <!-- ========== CONTENT AREA ========== -->
     <FrameLayout
         android:id="@+id/main_content_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
+        <!-- Feed List Page -->
         <LinearLayout
             android:id="@+id/page_list"
             android:layout_width="match_parent"
@@ -131,10 +144,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="20dp"
-                android:paddingVertical="12dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="6dp"
                 android:text="← 左滑卡片可移除"
-                android:textColor="#8B90A7"
-                android:textSize="12sp" />
+                android:textColor="#AAAAB8"
+                android:textSize="11sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/main_feed_list"
@@ -146,50 +160,53 @@
                 android:scrollbars="none" />
         </LinearLayout>
 
+        <!-- Browser Page -->
         <LinearLayout
             android:id="@+id/page_browser"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="12dp"
+            android:padding="14dp"
             android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <Spinner
                     android:id="@+id/browser_engine_spinner"
-                    android:layout_width="106dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/home_btn_secondary_bg" />
+                    android:layout_width="100dp"
+                    android:layout_height="46dp"
+                    android:background="@drawable/tab_inactive_bg" />
 
                 <EditText
                     android:id="@+id/browser_query_input"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:background="@drawable/home_search_bg"
                     android:hint="输入网址或关键词"
                     android:imeOptions="actionSearch"
                     android:inputType="textUri"
-                    android:paddingHorizontal="12dp"
+                    android:paddingHorizontal="14dp"
                     android:textColor="#2F3347"
-                    android:textColorHint="#8791A9"
+                    android:textColorHint="#AAAAB8"
                     android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/browser_go_btn"
-                    android:layout_width="70dp"
-                    android:layout_height="44dp"
+                    android:layout_width="72dp"
+                    android:layout_height="46dp"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/home_btn_primary_bg"
+                    android:background="@drawable/tab_active_bg"
                     android:text="前往"
                     android:textAllCaps="false"
-                    android:textColor="#2F3347"
-                    android:textSize="13sp" />
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <ProgressBar
@@ -200,59 +217,64 @@
                 android:layout_marginTop="8dp"
                 android:max="100"
                 android:progress="0"
+                android:progressTint="#6C63FF"
                 android:visibility="gone" />
 
             <WebView
                 android:id="@+id/browser_webview"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="10dp"
                 android:layout_weight="1" />
         </LinearLayout>
     </FrameLayout>
 
+    <!-- ========== BOTTOM TAB BAR ========== -->
     <LinearLayout
         android:id="@+id/home_bottom_tab"
         android:layout_width="match_parent"
-        android:layout_height="58dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="12dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="8dp">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        android:background="#F2F3F8">
 
         <Button
             android:id="@+id/tab_list"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:background="@drawable/home_btn_primary_bg"
-            android:text="列表"
+            android:background="@drawable/tab_active_bg"
+            android:text="🏠 列表"
             android:textAllCaps="false"
-            android:textColor="#2F3347"
-            android:textSize="13sp" />
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/tab_browser"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
-            android:background="@drawable/home_btn_secondary_bg"
-            android:text="浏览器"
+            android:background="@drawable/tab_inactive_bg"
+            android:text="🌐 浏览器"
             android:textAllCaps="false"
-            android:textColor="#2F3347"
+            android:textColor="#6C63FF"
             android:textSize="13sp" />
 
         <Button
             android:id="@+id/tab_apps"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
-            android:background="@drawable/home_btn_secondary_bg"
-            android:text="桌面APP"
+            android:background="@drawable/tab_inactive_bg"
+            android:text="📱 桌面APP"
             android:textAllCaps="false"
-            android:textColor="#2F3347"
+            android:textColor="#6C63FF"
             android:textSize="13sp" />
     </LinearLayout>
+
 </LinearLayout>
