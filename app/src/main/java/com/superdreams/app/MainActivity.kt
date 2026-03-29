@@ -52,6 +52,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var browserGoButton: Button
     private lateinit var browserProgress: ProgressBar
     private lateinit var browserWebView: WebView
+    private lateinit var browserHomepage: View
+    private lateinit var browserBackHome: View
     private var browserWebViewInitialized = false
     private var browserLoaded = false
     private var currentPage = HomePage.LIST
@@ -137,10 +139,16 @@ class MainActivity : AppCompatActivity() {
         browserGoButton = findViewById(R.id.browser_go_btn)
         browserProgress = findViewById(R.id.browser_progress)
         browserWebView = findViewById(R.id.browser_webview)
+        browserHomepage = findViewById(R.id.browser_homepage)
+        browserBackHome = findViewById(R.id.browser_back_home)
         browserWebViewInitialized = true
 
         setupBrowser()
         setupBrowserHomepage()
+
+        browserBackHome.setOnClickListener {
+            showBrowserHomepage()
+        }
         setupBottomTabs()
         applyHomeTheme()
 
@@ -178,9 +186,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (currentPage == HomePage.BROWSER && browserWebViewInitialized && browserWebView.canGoBack()) {
-            browserWebView.goBack()
-            return
+        if (currentPage == HomePage.BROWSER && browserWebViewInitialized) {
+            // First: go back in WebView history if possible
+            if (browserWebView.canGoBack()) {
+                browserWebView.goBack()
+                return
+            }
+            // Second: if WebView is showing, go back to homepage grid
+            if (browserWebView.visibility == View.VISIBLE) {
+                showBrowserHomepage()
+                return
+            }
         }
         if (currentPage != HomePage.LIST) {
             switchPage(HomePage.LIST)
@@ -329,11 +345,32 @@ class MainActivity : AppCompatActivity() {
         pageList.visibility = if (page == HomePage.LIST) View.VISIBLE else View.GONE
         pageBrowser.visibility = if (page == HomePage.BROWSER) View.VISIBLE else View.GONE
         pageMy.visibility = if (page == HomePage.MY) View.VISIBLE else View.GONE
+        // When switching to browser, show the homepage grid (not the WebView)
         if (page == HomePage.BROWSER && !browserLoaded) {
-            browserWebView.loadUrl("https://www.bing.com")
-            browserLoaded = true
+            showBrowserHomepage()
         }
         updateBottomTabStyles()
+    }
+
+    /**
+     * Show the WebView and hide the homepage grid. Called when navigating to a URL.
+     */
+    private fun showBrowserWebView(url: String) {
+        browserHomepage.visibility = View.GONE
+        browserWebView.visibility = View.VISIBLE
+        browserBackHome.visibility = View.VISIBLE
+        browserWebView.loadUrl(url)
+        browserLoaded = true
+    }
+
+    /**
+     * Show the homepage grid and hide the WebView. Called when pressing "back to homepage".
+     */
+    private fun showBrowserHomepage() {
+        browserWebView.stopLoading()
+        browserWebView.visibility = View.GONE
+        browserBackHome.visibility = View.GONE
+        browserHomepage.visibility = View.VISIBLE
     }
 
     private fun updateBottomTabStyles() {
@@ -378,9 +415,10 @@ class MainActivity : AppCompatActivity() {
         )
         engineMap.forEach { (viewId, url) ->
             findViewById<View>(viewId).setOnClickListener {
-                switchPage(HomePage.BROWSER)
-                browserWebView.loadUrl(url)
-                browserLoaded = true
+                if (currentPage != HomePage.BROWSER) {
+                    switchPage(HomePage.BROWSER)
+                }
+                showBrowserWebView(url)
             }
         }
     }
@@ -432,8 +470,7 @@ class MainActivity : AppCompatActivity() {
             val prefix = searchEngines[engine] ?: searchEngines.values.first()
             prefix + URLEncoder.encode(input, "UTF-8")
         }
-        browserWebView.loadUrl(targetUrl)
-        browserLoaded = true
+        showBrowserWebView(targetUrl)
     }
 }
 
