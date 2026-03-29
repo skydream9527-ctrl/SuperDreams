@@ -101,12 +101,17 @@ class DetailActivity : AppCompatActivity() {
                 btnOpen.visibility = View.GONE
             }
         } else if (url.isNotEmpty()) {
-            // For news/crawled items, open in browser
-            btnOpen.text = "在浏览器中打开原文"
+            // For news/crawled items, open in app's built-in browser
+            btnOpen.text = "在应用内浏览器中打开原文"
             btnOpen.visibility = View.VISIBLE
             btnOpen.setOnClickListener {
                 val finalUrl = if (url.startsWith("http")) url else "https://news.baidu.com$url"
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(finalUrl)))
+                val intent = Intent(this, com.superdreams.app.MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    putExtra("open_url_in_browser", finalUrl)
+                }
+                startActivity(intent)
+                finish()
             }
         } else {
             btnOpen.visibility = View.GONE

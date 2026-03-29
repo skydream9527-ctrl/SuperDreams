@@ -155,6 +155,15 @@ class FeedAdapter(
 
     private fun openDetail(holder: ViewHolder, item: FeedItem) {
         val context = holder.itemView.context
+
+        // For NEWS/CRAWLED items with a URL, open directly in app's built-in browser
+        if ((item.type == FeedType.NEWS || item.type == FeedType.CRAWLED) && item.url.isNotEmpty()) {
+            if (context is com.superdreams.app.MainActivity) {
+                context.openInAppBrowser(item.url)
+                return
+            }
+        }
+
         val detailContent = when {
             item.content.isNotBlank() -> item.content
             item.subtitle.isNotBlank() -> item.subtitle

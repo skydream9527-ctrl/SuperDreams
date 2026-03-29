@@ -176,6 +176,23 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btn_settings).setOnClickListener {
             startActivity(Intent(this, MyActivity::class.java))
         }
+
+        // Handle open_url_in_browser intent if present
+        handleBrowserIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.let { handleBrowserIntent(it) }
+    }
+
+    private fun handleBrowserIntent(intent: Intent) {
+        val url = intent.getStringExtra("open_url_in_browser")
+        if (!url.isNullOrEmpty()) {
+            // Remove the extra so it doesn't re-trigger
+            intent.removeExtra("open_url_in_browser")
+            openInAppBrowser(url)
+        }
     }
 
     override fun onResume() {
@@ -183,6 +200,17 @@ class MainActivity : AppCompatActivity() {
         applyHomeTheme()
         refreshList()
         checkNotificationAccess()
+    }
+
+    /**
+     * Open a URL in the app's built-in browser tab.
+     * Called from FeedAdapter when user clicks on a news item with a URL.
+     */
+    fun openInAppBrowser(url: String) {
+        if (url.isEmpty()) return
+        val finalUrl = if (url.startsWith("http")) url else "https://$url"
+        switchPage(HomePage.BROWSER)
+        showBrowserWebView(finalUrl)
     }
 
     override fun onBackPressed() {

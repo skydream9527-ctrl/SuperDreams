@@ -73,8 +73,8 @@ class SuperDreamsApp : Application() {
             val feedRepo = FeedRepository.getInstance(applicationContext)
             if (feedRepo.hasCrawledNews()) return@launch
 
-            val defaultKeywords = listOf("AI", "模型", "openclaw")
-            val crawledItems = ContentCrawler().crawlAll(defaultKeywords, maxItems = 20)
+            val defaultKeywords = listOf("人工智能", "AI", "大语言模型", "kimi", "字节跳动")
+            val crawledItems = ContentCrawler().crawlAll(defaultKeywords, maxItems = 30)
             if (crawledItems.isNotEmpty()) {
                 feedRepo.replaceCrawledItems(crawledItems)
                 SuperDreamsWidget.refreshWidget(applicationContext)
