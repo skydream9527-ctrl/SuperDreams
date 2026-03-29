@@ -42,14 +42,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var repository: FeedRepository
     private lateinit var pageList: View
     private lateinit var pageBrowser: View
-    private lateinit var tabList: Button
-    private lateinit var tabBrowser: Button
-    private lateinit var tabApps: Button
+    private lateinit var pageMy: View
+    private lateinit var tabList: View
+    private lateinit var tabBrowser: View
+    private lateinit var tabApps: View
+    private lateinit var tabMy: View
     private lateinit var browserSpinner: Spinner
     private lateinit var browserInput: EditText
     private lateinit var browserGoButton: Button
     private lateinit var browserProgress: ProgressBar
     private lateinit var browserWebView: WebView
+    private var browserWebViewInitialized = false
     private var browserLoaded = false
     private var currentPage = HomePage.LIST
     private val searchEngines = linkedMapOf(
@@ -124,16 +127,20 @@ class MainActivity : AppCompatActivity() {
 
         pageList = findViewById(R.id.page_list)
         pageBrowser = findViewById(R.id.page_browser)
+        pageMy = findViewById(R.id.page_my)
         tabList = findViewById(R.id.tab_list)
         tabBrowser = findViewById(R.id.tab_browser)
         tabApps = findViewById(R.id.tab_apps)
+        tabMy = findViewById(R.id.tab_my)
         browserSpinner = findViewById(R.id.browser_engine_spinner)
         browserInput = findViewById(R.id.browser_query_input)
         browserGoButton = findViewById(R.id.browser_go_btn)
         browserProgress = findViewById(R.id.browser_progress)
         browserWebView = findViewById(R.id.browser_webview)
+        browserWebViewInitialized = true
 
         setupBrowser()
+        setupBrowserHomepage()
         setupBottomTabs()
         applyHomeTheme()
 
@@ -156,6 +163,11 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btn_my).setOnClickListener {
             startActivity(Intent(this, MyActivity::class.java))
         }
+
+        // Settings button inside the embedded My page
+        findViewById<View>(R.id.btn_settings).setOnClickListener {
+            startActivity(Intent(this, MyActivity::class.java))
+        }
     }
 
     override fun onResume() {
@@ -166,15 +178,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (currentPage == HomePage.BROWSER && browserWebView.canGoBack()) {
+        if (currentPage == HomePage.BROWSER && browserWebViewInitialized && browserWebView.canGoBack()) {
             browserWebView.goBack()
+            return
+        }
+        if (currentPage != HomePage.LIST) {
+            switchPage(HomePage.LIST)
             return
         }
         super.onBackPressed()
     }
 
     override fun onDestroy() {
-        browserWebView.destroy()
+        if (browserWebViewInitialized) {
+            browserWebView.destroy()
+        }
         super.onDestroy()
     }
 
@@ -300,6 +318,9 @@ class MainActivity : AppCompatActivity() {
         tabApps.setOnClickListener {
             startActivity(Intent(this, AppListActivity::class.java))
         }
+        tabMy.setOnClickListener {
+            switchPage(HomePage.MY)
+        }
         switchPage(HomePage.LIST)
     }
 
@@ -307,6 +328,7 @@ class MainActivity : AppCompatActivity() {
         currentPage = page
         pageList.visibility = if (page == HomePage.LIST) View.VISIBLE else View.GONE
         pageBrowser.visibility = if (page == HomePage.BROWSER) View.VISIBLE else View.GONE
+        pageMy.visibility = if (page == HomePage.MY) View.VISIBLE else View.GONE
         if (page == HomePage.BROWSER && !browserLoaded) {
             browserWebView.loadUrl("https://www.bing.com")
             browserLoaded = true
@@ -316,30 +338,51 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateBottomTabStyles() {
         val palette = ThemePreference.getPalette(this)
-        val selectedBackground = createRoundedBackground(
-            palette.primaryFillColor,
-            palette.primaryStrokeColor,
-            14f
-        )
-        val normalBackground = createRoundedBackground(
-            palette.secondaryFillColor,
-            palette.secondaryStrokeColor,
-            14f
-        )
+        val selectedColor = palette.primaryFillColor
+        val normalColor = palette.secondaryFillColor
         val mapping = listOf(
             tabList to HomePage.LIST,
-            tabBrowser to HomePage.BROWSER
+            tabBrowser to HomePage.BROWSER,
+            tabApps to null,
+            tabMy to HomePage.MY
         )
-        mapping.forEach { (button, page) ->
-            button.background = if (page == currentPage) {
-                selectedBackground.constantState?.newDrawable()?.mutate()
-            } else {
-                normalBackground.constantState?.newDrawable()?.mutate()
+        mapping.forEach { (tab, page) ->
+            val isSelected = page != null && page == currentPage
+            tab.setBackgroundColor(if (isSelected) selectedColor else normalColor)
+            // Update label text colors inside the LinearLayout tabs
+            val labelId = when (tab.id) {
+                R.id.tab_list -> R.id.tab_list_label
+                R.id.tab_browser -> R.id.tab_browser_label
+                R.id.tab_apps -> R.id.tab_apps_label
+                R.id.tab_my -> R.id.tab_my_label
+                else -> null
             }
-            button.setTextColor(palette.titleTextColor)
+            if (labelId != null) {
+                findViewById<TextView>(labelId).setTextColor(
+                    if (isSelected) palette.primaryStrokeColor else palette.hintTextColor
+                )
+            }
         }
-        tabApps.background = normalBackground.constantState?.newDrawable()?.mutate()
-        tabApps.setTextColor(palette.titleTextColor)
+    }
+
+    private fun setupBrowserHomepage() {
+        val engineMap = mapOf(
+            R.id.engine_baidu to "https://www.baidu.com",
+            R.id.engine_sogou to "https://www.sogou.com",
+            R.id.engine_bing to "https://www.bing.com",
+            R.id.engine_douyin to "https://www.douyin.com",
+            R.id.engine_bilibili to "https://www.bilibili.com",
+            R.id.engine_qianwen to "https://tongyi.aliyun.com",
+            R.id.engine_doubao to "https://www.doubao.com",
+            R.id.engine_zhihu to "https://www.zhihu.com"
+        )
+        engineMap.forEach { (viewId, url) ->
+            findViewById<View>(viewId).setOnClickListener {
+                switchPage(HomePage.BROWSER)
+                browserWebView.loadUrl(url)
+                browserLoaded = true
+            }
+        }
     }
 
     private fun setupBrowser() {
@@ -395,5 +438,5 @@ class MainActivity : AppCompatActivity() {
 }
 
 enum class HomePage {
-    LIST, BROWSER
+    LIST, BROWSER, MY
 }
