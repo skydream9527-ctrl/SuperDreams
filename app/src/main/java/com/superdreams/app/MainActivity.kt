@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Patterns
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.webkit.WebChromeClient
@@ -378,9 +379,11 @@ class MainActivity : AppCompatActivity() {
     private fun openBrowserInput() {
         val input = browserInput.text.toString().trim()
         if (input.isEmpty()) return
-        val isUrl = input.startsWith("http://") || input.startsWith("https://")
+        val isUrl = input.startsWith("http://") ||
+            input.startsWith("https://") ||
+            (Patterns.WEB_URL.matcher(input).matches() && !input.contains(" "))
         val targetUrl = if (isUrl) {
-            input
+            if (input.startsWith("http://") || input.startsWith("https://")) input else "https://$input"
         } else {
             val engine = browserSpinner.selectedItem?.toString().orEmpty()
             val prefix = searchEngines[engine] ?: searchEngines.values.first()
