@@ -7,122 +7,40 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <!-- ========== HEADER ========== -->
+    <!-- ========== SLIM TOP BAR ========== -->
     <LinearLayout
         android:id="@+id/home_header_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:background="@drawable/home_header_bg"
-        android:orientation="vertical"
-        android:paddingTop="40dp"
-        android:paddingBottom="20dp"
+        android:orientation="horizontal"
+        android:gravity="center"
         android:paddingHorizontal="20dp">
 
-        <!-- Title Row -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/home_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:text="✨ superdreams"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+        <!-- Hidden views kept for code compatibility -->
+        <TextView
+            android:id="@+id/home_subtitle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:text="" />
 
-                <TextView
-                    android:id="@+id/home_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="✨ Super Dreams"
-                    android:textColor="#FFFFFF"
-                    android:textSize="26sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.01" />
-
-                <TextView
-                    android:id="@+id/home_subtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="您的信息流和待办事项"
-                    android:textColor="#CCE0FFFF"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-            <!-- My / Profile Button -->
-            <LinearLayout
-                android:id="@+id/btn_my"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="@drawable/home_btn_secondary_bg"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🙋"
-                    android:textSize="20sp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Action Buttons — Single Row -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_add_widget"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:background="@drawable/home_btn_primary_bg"
-                android:text="🧩 小部件"
-                android:textAllCaps="false"
-                android:textColor="#6C63FF"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/btn_manage_keywords"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/home_btn_secondary_bg"
-                android:text="🔑 关键词"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btn_manage_todos"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/home_btn_secondary_bg"
-                android:text="📋 待办"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btn_history"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/home_btn_secondary_bg"
-                android:text="📚 历史"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/home_swipe_hint"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:text="" />
     </LinearLayout>
 
     <!-- ========== CONTENT AREA ========== -->
@@ -140,12 +58,11 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/home_swipe_hint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="20dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="6dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="4dp"
                 android:text="← 左滑卡片可移除"
                 android:textColor="#AAAAB8"
                 android:textSize="11sp" />
@@ -169,6 +86,7 @@
             android:padding="14dp"
             android:visibility="gone">
 
+            <!-- Search Bar Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -177,7 +95,7 @@
 
                 <Spinner
                     android:id="@+id/browser_engine_spinner"
-                    android:layout_width="100dp"
+                    android:layout_width="90dp"
                     android:layout_height="46dp"
                     android:background="@drawable/tab_inactive_bg" />
 
@@ -198,11 +116,11 @@
 
                 <Button
                     android:id="@+id/browser_go_btn"
-                    android:layout_width="72dp"
+                    android:layout_width="64dp"
                     android:layout_height="46dp"
                     android:layout_marginStart="8dp"
                     android:background="@drawable/tab_active_bg"
-                    android:text="前往"
+                    android:text="搜索"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"
                     android:textSize="14sp"
@@ -214,19 +132,463 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
                 android:max="100"
                 android:progress="0"
                 android:progressTint="#6C63FF"
                 android:visibility="gone" />
 
+            <!-- ===== Browser Homepage (search engine grid) ===== -->
+            <ScrollView
+                android:id="@+id/browser_homepage"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="10dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="20dp">
+
+                    <!-- Section Title -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="14dp"
+                        android:text="🔍 常用搜索引擎"
+                        android:textColor="#2B2B3A"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <!-- Row 1: 百度 / 搜狗 / 必应 / 抖音 / B站 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/engine_baidu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingVertical="12dp">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/home_btn_primary_bg"
+                                android:gravity="center"
+                                android:text="🔵"
+                                android:textSize="22sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="百度"
+                                android:textColor="#2F3347"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/engine_sogou"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingVertical="12dp">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/home_btn_primary_bg"
+                                android:gravity="center"
+                                android:text="🔴"
+                                android:textSize="22sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="搜狗"
+                                android:textColor="#2F3347"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/engine_bing"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingVertical="12dp">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/home_btn_primary_bg"
+                                android:gravity="center"
+                                android:text="🟢"
+                                android:textSize="22sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="必应"
+                                android:textColor="#2F3347"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/engine_douyin"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingVertical="12dp">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/home_btn_primary_bg"
+                                android:gravity="center"
+                                android:text="🎵"
+                                android:textSize="22sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="抖音"
+                                android:textColor="#2F3347"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/engine_bilibili"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingVertical="12dp">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/home_btn_primary_bg"
+                                android:gravity="center"
+                                android:text="📺"
+                                android:textSize="22sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="B站"
+                                android:textColor="#2F3347"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Row 2: 千问 / 豆包 / 知乎 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/engine_qianwen"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingVertical="12dp">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/home_btn_primary_bg"
+                                android:gravity="center"
+                                android:text="🤖"
+                                android:textSize="22sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="千问"
+                                android:textColor="#2F3347"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/engine_doubao"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingVertical="12dp">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/home_btn_primary_bg"
+                                android:gravity="center"
+                                android:text="🧠"
+                                android:textSize="22sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="豆包"
+                                android:textColor="#2F3347"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/engine_zhihu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingVertical="12dp">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/home_btn_primary_bg"
+                                android:gravity="center"
+                                android:text="💡"
+                                android:textSize="22sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="知乎"
+                                android:textColor="#2F3347"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <!-- Invisible spacers to keep 5-column alignment -->
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+                    </LinearLayout>
+
+                    <!-- Back to Homepage button (shown when WebView is active) -->
+                    <Button
+                        android:id="@+id/browser_back_home"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/home_btn_secondary_bg"
+                        android:text="🏠 返回浏览器首页"
+                        android:textAllCaps="false"
+                        android:textColor="#6C63FF"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- WebView (hidden by default, shown when navigating) -->
             <WebView
                 android:id="@+id/browser_webview"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="10dp"
-                android:layout_weight="1" />
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:visibility="gone" />
         </LinearLayout>
+
+        <!-- Apps Page (placeholder, handled by AppListActivity) -->
+        <LinearLayout
+            android:id="@+id/page_apps"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📱"
+                android:textSize="48sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="桌面 APP"
+                android:textColor="#6C63FF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_open_app_list"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/tab_active_bg"
+                android:text="打开已安装 APP 列表"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:paddingHorizontal="24dp" />
+        </LinearLayout>
+
+        <!-- My Page (embedded, replaces MyActivity navigation) -->
+        <LinearLayout
+            android:id="@+id/page_my"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- My Page Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/my_page_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="我的"
+                        android:textColor="#2B2B3A"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="⚙ 设置"
+                    android:textColor="#2F3347"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    android:background="@drawable/home_btn_secondary_bg"
+                    android:paddingHorizontal="14dp" />
+            </LinearLayout>
+
+            <!-- Quick Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="12dp">
+
+                <Button
+                    android:id="@+id/btn_add_widget"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/home_btn_primary_bg"
+                    android:text="🧩 小部件"
+                    android:textAllCaps="false"
+                    android:textColor="#6C63FF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_manage_keywords"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/home_btn_secondary_bg"
+                    android:text="🔑 关键词"
+                    android:textAllCaps="false"
+                    android:textColor="#2F3347"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btn_manage_todos"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/home_btn_secondary_bg"
+                    android:text="📋 待办"
+                    android:textAllCaps="false"
+                    android:textColor="#2F3347"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btn_history"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/home_btn_secondary_bg"
+                    android:text="📚 历史"
+                    android:textAllCaps="false"
+                    android:textColor="#2F3347"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Divider line -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E5E7F0"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- My page content placeholder (history list etc.) via MyActivity intent -->
+            <TextView
+                android:id="@+id/my_page_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="8dp"
+                android:text="📦 存储记录"
+                android:textColor="#6C63FF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_my"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="16dp"
+                android:background="@drawable/tab_active_bg"
+                android:text="查看历史存储记录 →"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
     </FrameLayout>
 
     <!-- ========== BOTTOM TAB BAR ========== -->
@@ -235,46 +597,116 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
         android:paddingBottom="16dp"
-        android:background="#F2F3F8">
+        android:background="#FFFFFF"
+        android:elevation="8dp">
 
-        <Button
+        <LinearLayout
             android:id="@+id/tab_list"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="56dp"
             android:layout_weight="1"
-            android:background="@drawable/tab_active_bg"
-            android:text="🏠 列表"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingVertical="4dp">
 
-        <Button
+            <TextView
+                android:id="@+id/tab_list_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🏠"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tab_list_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="列表"
+                android:textColor="#6C63FF"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/tab_browser"
             android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="10dp"
+            android:layout_height="56dp"
             android:layout_weight="1"
-            android:background="@drawable/tab_inactive_bg"
-            android:text="🌐 浏览器"
-            android:textAllCaps="false"
-            android:textColor="#6C63FF"
-            android:textSize="13sp" />
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingVertical="4dp">
 
-        <Button
+            <TextView
+                android:id="@+id/tab_browser_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌐"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tab_browser_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="浏览器"
+                android:textColor="#AAAAB8"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/tab_apps"
             android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="10dp"
+            android:layout_height="56dp"
             android:layout_weight="1"
-            android:background="@drawable/tab_inactive_bg"
-            android:text="📱 桌面APP"
-            android:textAllCaps="false"
-            android:textColor="#6C63FF"
-            android:textSize="13sp" />
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingVertical="4dp">
+
+            <TextView
+                android:id="@+id/tab_apps_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📱"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tab_apps_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="桌面APP"
+                android:textColor="#AAAAB8"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tab_my"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingVertical="4dp">
+
+            <TextView
+                android:id="@+id/tab_my_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🙋"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tab_my_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="我的"
+                android:textColor="#AAAAB8"
+                android:textSize="10sp" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
