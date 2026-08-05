@@ -83,7 +83,7 @@
       <div class="notch-speaker"></div>
     </div>
     <div class="status-bar">
-      <span>20:48</span>
+      <span>09:50</span>
       <span>📶 5G  🔋 100%</span>
     </div>
     <div class="app-header">
@@ -92,16 +92,22 @@
     </div>
     <div class="app-body">
       
-          <div style="background:rgba(255,255,255,0.06); padding:16px; border-radius:16px; margin-bottom:16px;">
-            <div style="font-size:12px; color:#818cf8; font-weight:700;">WIDGET 插件 preview</div>
-            <div style="font-size:20px; font-weight:800; margin:8px 0;">今日新闻 & 待办</div>
-            <div style="font-size:13px; color:#94a3b8;">4 项待办任务 · 2 条未读焦点</div>
+          <div style="background:rgba(129, 140, 248, 0.12); border:1px solid rgba(129, 140, 248, 0.3); padding:16px; border-radius:16px; margin-bottom:16px; text-align:left;">
+            <div style="font-size:11px; color:#818cf8; font-weight:700; letter-spacing:1px;">WIDGET 插件预览</div>
+            <div style="font-size:18px; font-weight:800; margin:6px 0;">今日焦点 & 待办清单</div>
+            <div style="font-size:12px; color:#94a3b8;">4 项待办任务 · 2 条最新资讯</div>
           </div>
-          <div id="todoList" style="text-align:left; display:flex; flex-direction:column; gap:8px;">
-            <div class="todo-item" style="background:#1e293b; padding:10px 14px; border-radius:8px; font-size:13px;">✅ 完成 Android Widget 适配</div>
-            <div class="todo-item" style="background:#1e293b; padding:10px 14px; border-radius:8px; font-size:13px;">📰 阅读 AI 行业动态新闻</div>
+          <div id="todoList" style="text-align:left; display:flex; flex-direction:column; gap:10px;">
+            <div class="todo-item" style="background:#1e293b; padding:12px 14px; border-radius:10px; font-size:13px; border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+              <span>✅ 完成 Android Widget 适配</span>
+              <span style="font-size:11px; color:#10b981;">已完成</span>
+            </div>
+            <div class="todo-item" style="background:#1e293b; padding:12px 14px; border-radius:10px; font-size:13px; border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+              <span>📰 阅读 AI 行业最新论文动态</span>
+              <span style="font-size:11px; color:#f59e0b;">进行中</span>
+            </div>
           </div>
-          <button class="action-btn" onclick="addTodo()" style="margin-top:16px;">＋ 添加待办事项</button>
+          <button class="action-btn" onclick="addTodo()" style="margin-top:20px;">＋ 添加新待办事项</button>
         
     </div>
     <div class="home-bar"></div>
@@ -112,8 +118,8 @@
           function addTodo() {
             const list = document.getElementById('todoList');
             const item = document.createElement('div');
-            item.style.cssText = 'background:#1e293b; padding:10px 14px; border-radius:8px; font-size:13px; animation:fadeIn 0.3s ease;';
-            item.innerText = `📌 新待办任务 #${list.children.length + 1}`;
+            item.style.cssText = 'background:#1e293b; padding:12px 14px; border-radius:10px; font-size:13px; border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; animation:fadeIn 0.3s ease;';
+            item.innerHTML = `<span>📌 新待办任务 #${list.children.length + 1}</span><span style="font-size:11px; color:#38bdf8;">未完成</span>`;
             list.appendChild(item);
           }
         
